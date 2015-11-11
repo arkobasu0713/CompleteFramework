@@ -78,7 +78,6 @@ class enterDBSpace():
 		self.softwarePackage = '' 
 		self.softwarePackageID = 0
 		self.fileNames = []
-		self.dictOfFileObjects = {}
 		self.dictOfFileNames = {}
 
 	def reEstablishConnection(self):
@@ -141,10 +140,8 @@ class enterDBSpace():
 	
 		for eachCommandID1 in comSelect:
 			file1, filename = createScript(self.dictOfCommands[eachCommandID1],self.outputLocation)
-			self.dictOfFileObjects[eachCommandID1] = file1
 			self.dictOfFileNames[eachCommandID1] = filename
 
-#		print(self.dictOfFileObjects)
 #		print(self.dictOfFileNames)
 
 		for eachCommandID2 in comSelect:

@@ -137,16 +137,16 @@
 			orientation: 'horizontal'
 			size_hint: (1,.2)
 			Label:
-				text: 'Use all values in DB for arguments found inside commands.'
-				size_hint: (.5,1)
+				text: 'Generate scripts only.'
+				size_hint: (.3,1)
 				color: (1,1,0,1)
 			CheckBox:
 				on_active: root.setTrueAll()
-				size_hint: (.2,1)
+				size_hint: (.3,1)
 			Button:
 				id: button_id2_DPDS
 				text: 'Run selected commands.'
-				size_hint: (.3,1)
+				size_hint: (.4,1)
 				on_press: root.runCommandSuits()
 		Button:
 			id: button_id1_DPDS
