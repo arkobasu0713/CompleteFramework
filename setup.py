@@ -3,6 +3,7 @@
 #Date  : 11122015
 #Copyright: HGST Inc.
 #Description: Generic Automated Tool
+import argparse
 import sys
 import os
 import time
@@ -15,6 +16,7 @@ def mappingNetworkDrive(mapNetworkDrive):
 	if platform.system() == 'Windows':
 		print("Mapping network drive in Windows.")
 		commandString = "pushd " + mapNetworkDrive
+		print(commandString)
 		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
 		output, err = p.communicate()
 		if output.decode('ascii') == '':
@@ -23,7 +25,7 @@ def mappingNetworkDrive(mapNetworkDrive):
 			print("Mapping network drive was successful")
 
 	elif platform.system() == 'Linux':
-		#map network drive
+		print("Mapping network drive in Linux.")
 	else:
 		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
 
