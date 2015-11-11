@@ -119,9 +119,9 @@ class DisplayPackagesDetailsScreen(Screen):
 		conn.fetchArgumentsForSelectCommands(self.comSelect)
 		conn.retreiveValuesForArguments()
 		conn.createScripts(logFilePath,self.comSelect)
-		dictOfStatus = conn.runScripts()
-		createPopupDetails = UTIL.createPopupWidget2(sm,dictOfStatus,self.size)
-		createPopupDetails.open()
+#		dictOfStatus = conn.runScripts()
+#		createPopupDetails = UTIL.createPopupWidget2(sm,dictOfStatus,self.size)
+#		createPopupDetails.open()
 
 
 		for children in self.ids.grid_id_commands_DPDS.children:

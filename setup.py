@@ -13,9 +13,10 @@ import subprocess
 def mappingNetworkDrive(mapNetworkDrive):
 	print("Checking OS reqirements:")
 	print("Current OS the script is running on: " + str(platform.system()))
+	print(mapNetworkDrive)
 	if platform.system() == 'Windows':
 		print("Mapping network drive in Windows.")
-		commandString = "pushd " + mapNetworkDrive
+		commandString = "net use q: " + mapNetworkDrive
 		print(commandString)
 		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
 		output, err = p.communicate()
