@@ -1,0 +1,214 @@
+<WelcomeScreen>:
+	name: 'WelcomeScreen'
+	BoxLayout:
+		orientation: 'vertical'
+
+		Label:
+			text: 'Welcome to Automated Framework for Software Package Testing'
+			bold: True
+		GridLayout:
+			id: control_buttons_grid_id_WS
+			cols: 2
+			Button:
+				text: 'Enter Framework'
+				background_color: (1,1,0,1)
+				on_press: root.manager.current = 'ApplicationConsole'
+			Button:
+				text: 'Quit'
+				background_color: (1,0,0,1)
+				on_press: root.quit()
+
+<ApplicationControlScreen>:
+	name: 'ApplicationConsole'
+	BoxLayout:
+		orientation: 'vertical'
+		Button:
+			text: 'Create new software package testing suit'
+			background_color: (1,1,0,1)
+			on_press: root.manager.current = 'Create'
+		Button:
+			text: 'Proceed with existing'
+			background_color: (1,1,0,1)
+			on_press: root.fetchAndChangeScreen()
+		Button:
+			text: 'Back to Home Screen'
+			background_color: (1,0,0,1)
+			on_press: root.manager.current = 'WelcomeScreen'
+<CreateScreen>:
+	name: 'Create'
+	canvas.before:
+		Color:
+			rgb: 0,0,.3
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	BoxLayout:
+		orientation: 'vertical'
+		Label:
+			id: display_label_id_CS
+			text: 'Enter Package Details below'
+			bold: True
+			color: (1,1,0,1)
+			size: self.texture_size
+			font_size: 20
+			italic: True
+			size_hint: (1,.2)
+			
+		GridLayout:
+			id: gridLayout_for_softPackage_detail_id_CS
+			cols:2
+			row_force_default: True
+			row_default_height: 75
+			Label:
+				text: 'Package Name: '
+				color: (1,1,0,1)
+			TextInput:
+				id: softPackage_desc_entry_feild_id_CS
+			Label:
+				text: 'File location for software repository: '
+				color: (1,1,0,1)
+			TextInput:
+				id: softPackage_url_repo_entry_feild_id_CS				
+			Button:
+				text: 'Create Online'
+				background_color: (1,0,0,1)
+				on_press: root.createEntry()
+			Button:
+				text: 'Upload using XML files'
+				background_color: (1,0,0,1)
+				on_press: root.uploadFiles()
+
+		Button:
+			text: 'Back'
+			background_color: (1,0,0,1)
+			on_press: root.manager.current = 'ApplicationConsole'
+			size_hint: (1,.2)
+
+<DisplayPackagesDetailsScreen>:
+	name: 'DisplayPackagesDetailsScreen'
+	canvas.before:
+		Color:
+			rgb: 0,0,.3
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	BoxLayout:
+		id: box_id_DPDS
+		orientation: 'vertical'
+		Label:
+			id: label_id1_DPDS
+			multiline: True
+			text: 'The following command and test suits were discovered under the selected software package:-'
+			size: self.texture_size
+			color: (1,1,0,1)
+			size_hint: (1,.15)
+		BoxLayout:
+			orientation: 'vertical'
+			Label:
+				text: 'Commands: '
+				color: (1,1,0,1)
+				size_hint: (1,.1)
+				halign: 'left'
+			GridLayout:
+				id: grid_id_commands_DPDS
+				cols: 4
+				size_hint: (1,.4)
+			Label:
+				text: 'Custom Test Suits: '
+				color: (1,1,0,1)
+				size_hint: (1,.1)
+				halign: 'left'
+			GridLayout:
+				id: grid_id_customTestSuit_DPDS
+				cols: 4
+				size_hint: (1,.5)
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.2)
+			Label:	
+				text: 'Generate Log at: '
+				color: (1,1,0,1)
+				size_hint: (.3,.2)
+			TextInput:
+				id: id_logpath_DPDS
+				size_hint: (.7,.45)
+							
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.2)
+			Label:
+				text: 'Use all values in DB for arguments found inside commands.'
+				size_hint: (.5,1)
+				color: (1,1,0,1)
+			CheckBox:
+				on_active: root.setTrueAll()
+				size_hint: (.2,1)
+			Button:
+				id: button_id2_DPDS
+				text: 'Run selected commands.'
+				size_hint: (.3,1)
+				on_press: root.runCommandSuits()
+		Button:
+			id: button_id1_DPDS
+			text: 'Back'
+			background_color: (1,0,0,1)
+			size_hint: (1,.2)
+			on_press: root.manager.current = 'DisplayResultsScreen'
+			on_press: root.callback()
+
+
+<DisplayResultsScreen>:
+	name: 'DisplayResultsScreen'
+	canvas.before:
+		Color:
+			rgb: 0,0,.3
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	BoxLayout:
+		id: box_id_DRS
+		orientation: 'vertical'
+		Label:
+			text: 'The following software packages were found. Click on the one you wish to proceed with.'
+			color: (1,1,0,1)
+			size_hint: (1,.2)
+		BoxLayout:
+			id: innerBoxForSoftwarePackageButton_id_DRS
+			orientation: 'vertical'
+			size_hint: (1,.6)
+		BoxLayout:
+			orientation: 'horizontal'
+			Button:
+				text: 'Refresh Database'
+				on_press: root.refresh()
+				background_color: (1,0,0,1)
+				size_hint: (1,.2)
+			Button:
+				text: 'Back'
+				background_color: (1,0,0,1)
+				on_press: root.manager.current = 'ApplicationConsole'
+				size_hint: (1,.2)
+
+
+<MyCustomPopupWidget>:
+	title: 'Status Screen'
+	size_hint: 1.0,0.6
+	id: popup1
+	BoxLayout:
+		orientation: 'vertical'
+		Label:
+			text: 'Success'
+			color: (1,0,0,1)
+			size_hint: (1,.25)
+		Text:
+			text: ''
+			size_hint: (1,.5)
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.25)
+			Button:
+				text: 'Ok. Take be back to Framework Base Screen'
+				on_press: root.on_press_ok()
+			Button:
+				text: 'Logs'
+				on_press: root.dismiss()
