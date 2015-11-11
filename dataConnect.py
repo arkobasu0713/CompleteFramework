@@ -192,6 +192,7 @@ class enterDBSpace():
 				writeFile.write("---------------------------------------------------------------------\n")
 				if output.decode('ascii') == '':
 					writeFile.write("Command execution Status: FAILED\n")
+					writeFile.write("Class of ERROR code: " + str(p.returncode) + '\n')
 				else:
 					writeFile.write("Command execution Status: SUCCESS\n")
 				writeFile.write("=====================================================================\n")

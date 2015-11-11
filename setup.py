@@ -21,6 +21,7 @@ def mappingNetworkDrive(mapNetworkDrive):
 		output, err = p.communicate()
 		if output.decode('ascii') == '':
 			print("Mapping network drive was unsuccessful")
+			print(err.decode('ascii'))
 		else:
 			print("Mapping network drive was successful")
 
