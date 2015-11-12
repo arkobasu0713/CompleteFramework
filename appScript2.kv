@@ -70,13 +70,15 @@
 			TextInput:
 				id: softPackage_url_repo_entry_feild_id_CS				
 			Button:
-				text: 'Create Online'
+				text: 'Save to database'
 				background_color: (1,0,0,1)
+				size_hint: (.3,1)
 				on_press: root.createEntry()
 			Button:
-				text: 'Upload using XML files'
+				text: 'Create root directory for software package under mapped drive'
 				background_color: (1,0,0,1)
-				on_press: root.uploadFiles()
+				size_hint: (.7,1)
+				on_press: root.createRootDirectory()
 
 		Button:
 			text: 'Back'

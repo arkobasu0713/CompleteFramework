@@ -48,19 +48,17 @@ class CreateScreen(Screen):
 		super(CreateScreen,self).__init__(**kwargs)
 
 	def createEntry(self):
-		print("In createEntry")
-
 		customPopWidget = UTIL.createPopupWidget1(sm)
-		print("aftercreating")
 		softwarePackageName = self.ids.softPackage_desc_entry_feild_id_CS.text
 		softwarePackageLocation = self.ids.softPackage_url_repo_entry_feild_id_CS.text
-		UTIL.processNewEntrySoftPackage(softwarePackageName,softwarePackageLocation)
-		print("Before opening")
-		customPopWidget.open()
+		if softwarePackageName != '':
+			UTIL.processNewEntrySoftPackage(softwarePackageName,softwarePackageLocation)
+			customPopWidget.open()
+		else:
+			print("Enter software package details")
 
-	def uploadFiles(self):
-		customPopWidget = createPopupWidget2()
-		print('Uploading Files')
+	def createRootDirectory(self):
+		print('Procedure to create root directory under mapped drive')
 
 class ApplicationControlScreen(Screen):
 	pass
