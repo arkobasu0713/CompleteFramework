@@ -121,7 +121,7 @@
 			GridLayout:
 				id: grid_id_customTestSuit_DPDS
 				cols: 4
-				size_hint: (1,.5)
+				size_hint: (1,.4)
 		BoxLayout:
 			orientation: 'horizontal'
 			size_hint: (1,.2)
@@ -135,24 +135,39 @@
 							
 		BoxLayout:
 			orientation: 'horizontal'
-			size_hint: (1,.2)
+			size_hint: (1,.15)
 			Label:
 				text: 'Generate scripts only.'
 				size_hint: (.3,1)
 				color: (1,1,0,1)
 			CheckBox:
+				id: id_checkBox_DPDS
 				on_active: root.setTrueAll()
-				size_hint: (.3,1)
+				size_hint: (.15,1)
 			Button:
 				id: button_id2_DPDS
 				text: 'Run selected commands.'
 				size_hint: (.4,1)
 				on_press: root.runCommandSuits()
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.15)
+			Button:
+				id: button_id3_DPDS
+				background_color: (1,0,0,1)
+				text: 'Create Folder in mapped Network Drive'
+				on_press: root.createFolder()
+			Button:
+				id: button_id4_DPDS
+				background_color: (1,0,0,1)
+				text: 'Map Network Drive'
+				on_press: root.mapNetworkDrive()
+
 		Button:
 			id: button_id1_DPDS
 			text: 'Back'
 			background_color: (1,0,0,1)
-			size_hint: (1,.2)
+			size_hint: (1,.15)
 			on_press: root.manager.current = 'DisplayResultsScreen'
 			on_press: root.callback()
 
@@ -190,25 +205,3 @@
 				size_hint: (1,.2)
 
 
-<MyCustomPopupWidget>:
-	title: 'Status Screen'
-	size_hint: 1.0,0.6
-	id: popup1
-	BoxLayout:
-		orientation: 'vertical'
-		Label:
-			text: 'Success'
-			color: (1,0,0,1)
-			size_hint: (1,.25)
-		Text:
-			text: ''
-			size_hint: (1,.5)
-		BoxLayout:
-			orientation: 'horizontal'
-			size_hint: (1,.25)
-			Button:
-				text: 'Ok. Take be back to Framework Base Screen'
-				on_press: root.on_press_ok()
-			Button:
-				text: 'Logs'
-				on_press: root.dismiss()

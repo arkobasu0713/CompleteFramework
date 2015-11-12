@@ -87,6 +87,7 @@ class DisplayPackagesDetailsScreen(Screen):
 	def __init__(self,**kwargs):
 		super(DisplayPackagesDetailsScreen,self).__init__(**kwargs)
 		self.buttonIDList = []
+		self.runScript = 'N'
 
 		self.comSelect = []
 		
@@ -100,8 +101,12 @@ class DisplayPackagesDetailsScreen(Screen):
 			btn_temp.bind(on_press=Par(self.addSelection, eachCommand,idString))
 		
 	
-	def setTrueAll(self):
-		print("Set true all") #needs to be changed
+	def setTrueAll(self,*args):
+		if self.ids.id_checkBox_DPDS.state == 'down':
+			self.runScript = 'Y'
+		else:
+			self.runScript = 'N'
+
 		
 	def addSelection(self,*args):
 		print("Selection: " + str(args[0]))
@@ -119,9 +124,10 @@ class DisplayPackagesDetailsScreen(Screen):
 		conn.fetchArgumentsForSelectCommands(self.comSelect)
 		conn.retreiveValuesForArguments()
 		conn.createScripts(logFilePath,self.comSelect)
-#		dictOfStatus = conn.runScripts()
-#		createPopupDetails = UTIL.createPopupWidget2(sm,dictOfStatus,self.size)
-#		createPopupDetails.open()
+		if self.runScript == 'Y':
+			dictOfStatus = conn.runScripts()
+			createPopupDetails = UTIL.createPopupWidget2(sm,dictOfStatus,self.size)
+			createPopupDetails.open()
 
 
 		for children in self.ids.grid_id_commands_DPDS.children:
@@ -129,6 +135,12 @@ class DisplayPackagesDetailsScreen(Screen):
 				children.background_color = (.5,.2,.2,1)
 		del self.comSelect[:]
 		del self.buttonIDList[:]
+
+	def createFolder(self):
+		print("Creating folder under mapped network drive with software package name")
+
+	def mapNetworkDrive(self):
+		print("Mapping network drive to framework")
 
 
 	def callback(self):
@@ -151,7 +163,7 @@ class DisplayResultsScreen(Screen):
 		print(conn.dictOfPackages)
 		self.ids.innerBoxForSoftwarePackageButton_id_DRS.clear_widgets()
 		for softPackageID in conn.dictOfPackages:
-			btn = Button(text=conn.dictOfPackages[softPackageID], id=str(softPackageID), size_hint=(1,.2), background_color= (1,1,0,1))
+			btn = Button(text=conn.dictOfPackages[softPackageID], id=str(softPackageID), size_hint=(1,.15), background_color= (1,1,0,1))
 			self.ids.innerBoxForSoftwarePackageButton_id_DRS.add_widget(btn)
 			btn.bind(on_press=Par(self.enterPackage,softPackageID,conn.dictOfPackages[softPackageID]))
 		
