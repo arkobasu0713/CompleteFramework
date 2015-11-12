@@ -112,6 +112,7 @@ def runScript(scriptName,logDest):
 	numOfScripts = 0
 	fail = 0
 	success = 0
+	print("Running Script: " + scriptName)
 	for eachLine in readFile:
 		writeFile.write("=====================================================================\n")
 		writeFile.write("Running: " + eachLine)
@@ -133,6 +134,10 @@ def runScript(scriptName,logDest):
 		else:
 			writeFile.write("Command execution Status: SUCCESS\n")
 		writeFile.write("=====================================================================\n")
+	print("\tRun Complete.")
+	print("\tTotal number of commands executed from the scripts: " + str(numOfScripts))
+	print("\tNumber of execution failures: " + str(fail))
+	print("\tNumber of execution success: " + str(success))
 
 
 def createLogDest(logDest):
