@@ -69,18 +69,16 @@ def createPopupExit(sm):
 
 	return popup
 
-def createPopupWidget1(sm):
+def createPopupWidget1(sm,msg):
 
 	
 	mainBox = BoxLayout(orientation='vertical')
-	label = Label(text='Success', color=(1,0,0,1))
+	label = Label(text=msg, color=(1,0,0,1))
 	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.25))
 	btn_ok = Button(text='Ok. Take me back to App Screen',background_color=(1,0,0,1), size_hint=(.7,1))
-	btn_showLog = Button(text='Logs',background_color=(1,0,0,1),size_hint=(.3,1))
-
+	
 	innerButtonControlBox.add_widget(btn_ok)
-	innerButtonControlBox.add_widget(btn_showLog)
-
+	
 	mainBox.add_widget(label)
 	mainBox.add_widget(innerButtonControlBox)
 

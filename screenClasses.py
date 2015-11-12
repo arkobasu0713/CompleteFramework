@@ -48,14 +48,17 @@ class CreateScreen(Screen):
 		super(CreateScreen,self).__init__(**kwargs)
 
 	def createEntry(self):
-		customPopWidget = UTIL.createPopupWidget1(sm)
 		softwarePackageName = self.ids.softPackage_desc_entry_feild_id_CS.text
 		softwarePackageLocation = self.ids.softPackage_url_repo_entry_feild_id_CS.text
 		if softwarePackageName != '':
 			UTIL.processNewEntrySoftPackage(softwarePackageName,softwarePackageLocation)
+			customPopWidget = UTIL.createPopupWidget1(sm,'Success')
 			customPopWidget.open()
 		else:
 			print("Enter software package details")
+			customPopWidget = UTIL.createPopupWidget1(sm,'Wrong Try')
+			customPopWidget.open()
+
 
 	def createRootDirectory(self):
 		print('Procedure to create root directory under mapped drive')
