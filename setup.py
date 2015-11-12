@@ -19,9 +19,7 @@ def RunScript(commandString):
 	return p
 
 def mappingNetworkDrive(mapNetworkDrive):
-	print("Checking OS reqirements:")
 	print("Current OS the script is running on: " + str(platform.system()))
-	print(mapNetworkDrive)
 	if platform.system() == 'Windows':
 		print("Mapping network drive in Windows.")
 		
@@ -30,13 +28,11 @@ def mappingNetworkDrive(mapNetworkDrive):
 
 		username = input("Enter username(optional): ")
 		password = input("Enter password(optional): ")
-		print(username)
-		print(password)
 
 		if username and password != '':
 			commandString = commandString + "/user:" + username + " " + password
 		else:
-			print("Error in username password.") #needs to be worked upon
+			print("Error in username password. Going ahaed with deafult values") #needs to be worked upon
 		
 		print("Cmd String: " + commandString)
 		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
@@ -74,15 +70,12 @@ def mappingNetworkDrive(mapNetworkDrive):
 		username = input("Enter username(optional): ")
 		password = input("Enter password(optional): ")
 
-		print(username)
-		print(password)
-
 		commandString = commandString + " " + mountLocation
 
 		if username and password != '':
 			commandString = commandString + " -o username=" + username + ",password=" + password
 		else:
-			print("Error in username password. Going with default values") #needs to be worked upon
+			print("Error in username password. Going ahead with default values") #needs to be worked upon
 			commandString = commandString + " -o username=disty,password=sitlab"
 		
 		print("Cmd String: " + commandString)
@@ -97,6 +90,7 @@ def mappingNetworkDrive(mapNetworkDrive):
 	else:
 		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
 		return ''
+
 def createOutputFile(fileName,logDest):
 	outputFileLocation = logDest
 	justFileName = (os.path.basename(fileName)).split('.txt')[0]
@@ -167,24 +161,31 @@ if __name__ == "__main__":
 	unMap = args.unMapNetworkDrive
 
 	dictOfFileNames = {}
+	dictOfSpecificFileNames = {}
+
+	if mapNetworkDrive is not None:
+		mapDriveAt = mappingNetworkDrive(mapNetworkDrive)
+		i = 1
+		for root, dirs, f in os.walk(mapDriveAt):
+			for files in f:
+				if files.endswith(".txt"):
+					dictOfFileNames[i] = os.path.join(root,files)
+					i = i + 1
+
+	if testScriptFileName is not None:
+		j=1
+		for eachValue in dictOfFileNames:
+			if testScriptFileName in dictOfFileNames[eachValue]:
+				dictOfSpecificFileNames[j] = dictOfFileNames[eachValue]
+				j=j+1
 
 	while True:
+		
+		print("The following script files were found in the remote network drive: ")
+		print(dictOfFileNames)
+		run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
+		run = [int(i) for i in run]
 		try:
-			if mapNetworkDrive is not None:
-				mapDriveAt = mappingNetworkDrive(mapNetworkDrive)
-			
-			i = 1
-
-			for root, dirs, f in os.walk(mapDriveAt):
-				for files in f:
-					if files.endswith(".txt"):
-						dictOfFileNames[i] = os.path.join(root,files)
-						i = i + 1
-			print("The following script files were found in the remote network drive: ")
-			print(dictOfFileNames)
-			run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
-			run = [int(i) for i in run]
-
 			create = (input("Do you wish to create the logs in the mapped remote drive (M) or do you want them to be logged in default way on local files(L) : ")).upper()
 			if create != 'M':
 				logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
@@ -198,6 +199,9 @@ if __name__ == "__main__":
 				for serialScriptNum in run:
 					runScript(dictOfFileNames[serialScriptNum],logDest)
 			
+			cont = (input("Do you wish to continue testing other scripts?(y): ")).upper()
+			if cont != 'Y':
+				break
 
 		except OSError as exc:
 			print(exc.errno)
