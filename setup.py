@@ -184,18 +184,16 @@ if __name__ == "__main__":
 
 	while True:
 		
-		print("The following script files were found in the remote network drive: ")
-		print(dictOfFileNames)
-		run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
-		run = [int(i) for i in run]
 		try:
+			print("The following script files were found in the remote network drive: ")
+			print(dictOfFileNames)
+			run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
+			run = [int(i) for i in run]
 			logDest = ''
-			create = (input("Do you wish to create the logs in the mapped remote drive (M) or do you want them to be logged in default way on local files(L) : ")).upper()
-			if create != 'M':
-				logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
-				if logDest == '':
-					logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d"))))
-				createLogDest(logDest)
+			logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
+			if logDest == '':
+				logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d-%m-%s"))))
+			createLogDest(logDest)
 			if len(run) == 1 and run[0] == 0:
 				for eachFile in dictOfFileNames:
 					runScript(dictOfFileNames[eachFile],logDest)
@@ -210,10 +208,10 @@ if __name__ == "__main__":
 						try:
 							shutil.copy(fullFileName,mapDriveAt)
 						except OSError as exc:
-							raise
+							print(exc.strerror)
+						
 						else:
 							print("Copy of " + fullFileName + " to remote drive " + mapDriveAt + " successful.")
-						#print(mapDriveAt)
 			
 			cont = (input("Do you wish to continue testing other scripts?(y): ")).upper()
 			if cont != 'Y':
@@ -221,7 +219,6 @@ if __name__ == "__main__":
 
 		except OSError as exc:
 			print(exc.errno)
-			break
-		else:
-			break
+
+
 			
