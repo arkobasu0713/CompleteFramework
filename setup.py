@@ -10,6 +10,14 @@ import time
 import platform
 import subprocess
 
+def RunScript(commandString):
+
+	"""Runs a command string.
+	Returns the object of Popen once the command is run."""
+
+	p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
+	return p
+
 def mappingNetworkDrive(mapNetworkDrive):
 	print("Checking OS reqirements:")
 	print("Current OS the script is running on: " + str(platform.system()))
@@ -88,13 +96,62 @@ def mappingNetworkDrive(mapNetworkDrive):
 		return mountLocation
 	else:
 		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
-		sys.exit(0)
+		return ''
+def createOutputFile(fileName,logDest):
+	outputFileLocation = logDest
+	justFileName = (os.path.basename(fileName)).split('.txt')[0]
+	
+	outputLogFileName = justFileName + ".log"
+	outputLogFileLoc = os.path.join(outputFileLocation, outputLogFileName)
+	file =open(outputLogFileLoc,'w')
+	return file
+
+def runScript(scriptName,logDest):
+	writeFile = createOutputFile(scriptName,logDest)
+	readFile = open(scriptName,'r')
+	numOfScripts = 0
+	fail = 0
+	success = 0
+	for eachLine in readFile:
+		writeFile.write("=====================================================================\n")
+		writeFile.write("Running: " + eachLine)
+		writeFile.write('\n')
+		p = RunScript(eachLine)
+		output, err = p.communicate()
+		if output.decode('ascii') == '':
+			writeFile.write(err.decode('ascii'))
+			fail = fail + 1
+		else:
+			writeFile.write(output.decode('ascii'))
+			success = success + 1
+		writeFile.write("\n")
+		numOfScripts = numOfScripts + 1
+		writeFile.write("---------------------------------------------------------------------\n")
+		if output.decode('ascii') == '':
+			writeFile.write("Command execution Status: FAILED\n")
+			writeFile.write("Class of ERROR code: " + str(p.returncode) + '\n')
+		else:
+			writeFile.write("Command execution Status: SUCCESS\n")
+		writeFile.write("=====================================================================\n")
+
+
+def createLogDest(logDest):
+	
+	if not os.path.exists(logDest):
+		print("Path doesn't exist. Creating Mount location")
+		try:
+			os.mkdir(logDest)
+		except OSError as exc1:
+			if exc1.errno == errno.EEXIST and os.path.isdir(mountLocation):
+				pass
+			else: raise
+	return logDest
 
 if __name__ == "__main__":
 	
 	parser = argparse.ArgumentParser(description="Generic Automated System test tool Script to run test scripts from a remote location. Please note that if the map network drive option is not provided the script looks for the files/directory provided in the argument under its root directory structure.")
 	parser.add_argument('-t','--testScriptFileName', dest='testScriptFileName', help='absolute path for the test script that needs to be run in slave system.')
-	parser.add_argument('-d','--testScriptDirectory', dest='testScriptDirectory', help='absolute path for the directory containing the test scripts.')
+	parser.add_argument('-d','--testScriptDirectory', dest='testScriptDirectory', help='absolute path for the directory containing the test scripts. Please note that this needs to be run with')
 	parser.add_argument('-m','--mapNetworkDrive', dest='mapNetworkDrive', help='This option is used to map a network drive for the extraction of the scripts from a remote server location for the framework. You could add -d/--testScriptDirectory option along with this to specify the folder name inside the network drive.')
 	parser.add_argument('-u','--unMapNetworkDrive',dest='unMapNetworkDrive',help='run this option alone after using the test script to unmap the network drive')
 
@@ -104,11 +161,42 @@ if __name__ == "__main__":
 	mapNetworkDrive = args.mapNetworkDrive
 	unMap = args.unMapNetworkDrive
 
+	dictOfFileNames = {}
+
 	while True:
 		try:
 			if mapNetworkDrive is not None:
 				mapDriveAt = mappingNetworkDrive(mapNetworkDrive)
+			
+			i = 1
+
+			for root, dirs, f in os.walk(mapDriveAt):
+				for files in f:
+					if files.endswith(".txt"):
+						dictOfFileNames[i] = os.path.join(root,files)
+						i = i + 1
+			print("The following script files were found in the remote network drive: ")
+			print(dictOfFileNames)
+			run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
+			run = [int(i) for i in run]
+
+			create = (input("Do you wish to create the logs in the mapped remote drive (M) or do you want them to be logged in default way on local files(L) : ")).upper()
+			if create != 'M':
+				logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
+				if logDest == '':
+					logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d"))))
+				createLogDest(logDest)
+			if len(run) == 1 and run[0] == 0:
+				for eachFile in dictOfFileNames:
+					runScript(dictOfFileNames[eachFile],logDest)
+			else:
+				for serialScriptNum in run:
+					runScript(dictOfFileNames[serialScriptNum],logDest)
+			
+
 		except OSError as exc:
 			print(exc.errno)
+			break
+		else:
 			break
 			
