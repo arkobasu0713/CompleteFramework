@@ -1,3 +1,5 @@
+#:import Screen kivy.uix.screenmanager
+
 <WelcomeScreen>:
 	name: 'WelcomeScreen'
 	BoxLayout:
@@ -58,32 +60,44 @@
 			id: gridLayout_for_softPackage_detail_id_CS
 			cols:2
 			row_force_default: True
-			row_default_height: 75
+			row_default_height: 50
 			Label:
-				text: 'Package Name: '
+				text: 'Software Package Name: '
 				color: (1,1,0,1)
 			TextInput:
 				id: softPackage_desc_entry_feild_id_CS
 			Label:
-				text: 'File location for software repository: '
+				text: 'Primary root location for storing scripts: '
 				color: (1,1,0,1)
 			TextInput:
 				id: softPackage_url_repo_entry_feild_id_CS				
-			Button:
-				text: 'Save to database'
-				background_color: (1,0,0,1)
-				on_press: root.createEntry()
-			Button:
-				text: 'Create root directory for software package under mapped drive'
-				font_size: 13
-				background_color: (1,0,0,1)
-				on_press: root.createRootDirectory()
+			
+			
+		BoxLayout:
+			orientation: 'vertical'
+			size_hint: (1,.3)
+			BoxLayout:
+				orientation: 'horizontal'
+				Button:
+					text: 'Save to database'
+					background_color: (1,0,0,1)
+					on_press: root.createEntry()
+				Button:
+					text: 'Create root directory for software package under mapped drive'
+					font_size: 13
+					background_color: (1,0,0,1)
+					on_press: root.createRootDirectory()
+			BoxLayout:
+				orientation: 'horizontal'
+				Button:
+					text: 'Map Network Drive'
+					background_color: (1,0,0,1)
+					on_press: root.mapDrive()
+				Button:
+					text: 'Back'
+					background_color: (1,0,0,1)
+					on_press: root.manager.current = 'ApplicationConsole'
 
-		Button:
-			text: 'Back'
-			background_color: (1,0,0,1)
-			on_press: root.manager.current = 'ApplicationConsole'
-			size_hint: (1,.2)
 
 <DisplayPackagesDetailsScreen>:
 	name: 'DisplayPackagesDetailsScreen'
@@ -99,7 +113,7 @@
 		Label:
 			id: label_id1_DPDS
 			multiline: True
-			text: 'The following command and test suits were discovered under the selected software package:-'
+			text: 'Commands and Test Suits:'
 			size: self.texture_size
 			color: (1,1,0,1)
 			size_hint: (1,.15)
@@ -125,14 +139,35 @@
 				size_hint: (1,.4)
 		BoxLayout:
 			orientation: 'horizontal'
-			size_hint: (1,.2)
+			size_hint: (1,.1)
+			Button:
+				text: 'Create New Argument'
+				color: (1,1,0,1)
+				on_press: root.manager.current = 'CreateArgumentScreen'
+			Button: 
+				text: 'Edit Argument'
+				color: (1,1,0,1)
+				on_press: root.editArgument()
+			Button:
+				text: 'Create New Test Suit'
+				color: (1,1,0,1)
+				font_size: 15
+				on_press: root.manager.current = 'CreateNewTestSuitScreen'
+			Button: 
+				text: 'Edit Test Suit'
+				color: (1,1,0,1)
+				on_press: root.editTestSuit()
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.1)
 			Label:	
 				text: 'Generate Log at: '
 				color: (1,1,0,1)
-				size_hint: (.3,.2)
+				size_hint: (.3,1)
+				allow_copy: True
 			TextInput:
 				id: id_logpath_DPDS
-				size_hint: (.7,.45)
+				size_hint: (.7,1)
 							
 		BoxLayout:
 			orientation: 'horizontal'
@@ -154,23 +189,28 @@
 			orientation: 'horizontal'
 			size_hint: (1,.15)
 			Button:
+				id: button_id4_DPDS
+				background_color: (1,0,0,1)
+				text: 'Map Network Drive'
+				on_press: root.mapNetworkDrive()			
+			Button:
 				id: button_id3_DPDS
 				background_color: (1,0,0,1)
 				text: 'Create Folder in mapped Network Drive'
 				on_press: root.createFolder()
-			Button:
-				id: button_id4_DPDS
-				background_color: (1,0,0,1)
-				text: 'Map Network Drive'
-				on_press: root.mapNetworkDrive()
-
-		Button:
-			id: button_id1_DPDS
-			text: 'Back'
-			background_color: (1,0,0,1)
+			
+		BoxLayout:
+			orientation: 'horizontal'
 			size_hint: (1,.15)
-			on_press: root.manager.current = 'DisplayResultsScreen'
-			on_press: root.callback()
+			Button:
+				text: 'Refresh Contents'
+				background_color: (1,0,0,1)
+			Button:
+				id: button_id1_DPDS
+				text: 'Back'
+				background_color: (1,0,0,1)
+				on_press: root.manager.current = 'DisplayResultsScreen'
+				on_press: root.callback()
 
 
 <DisplayResultsScreen>:
@@ -205,4 +245,25 @@
 				on_press: root.manager.current = 'ApplicationConsole'
 				size_hint: (1,.2)
 
+<CreateArgumentScreen>:
+	name: 'CreateArgumentScreen'
+	Label:
+		text: 'This is the argument creating screen'
+		color: (1,1,0,1)
+	Button:
+		text: 'Back'
+		background_color: (1,0,0,1)
+		on_press: root.manager.current = 'DisplayPackagesDetailsScreen'
+		size_hint: (1,.2)
+
+<CreateNewTestSuitScreen>:
+	name: 'CreateNewTestSuitScreen'
+	Label:
+		text: 'This is the Test Suit creating screen'
+		color: (1,1,0,1)
+	Button:
+		text: 'Back'
+		background_color: (1,0,0,1)
+		on_press: root.manager.current = 'DisplayPackagesDetailsScreen'
+		size_hint: (1,.2)
 

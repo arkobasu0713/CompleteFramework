@@ -25,6 +25,8 @@ import dynamicUtilsUI as UTIL
 global conn
 conn = DBConn.enterDBSpace()
 sm = ScreenManager()
+global mapDriveAt
+mapDriveAt = ''
 
 
 class MyCustomPopupWidget(Popup):
@@ -37,6 +39,9 @@ class MyCustomPopupWidget(Popup):
 		self.dismiss
 		UTIL.backApp(sm)
 
+class CreateArgumentScreen(Screen):
+	pass
+
 class WelcomeScreen(Screen):
 	pass
 	def quit(self):
@@ -46,6 +51,7 @@ class WelcomeScreen(Screen):
 class CreateScreen(Screen):
 	def __init__(self,**kwargs):
 		super(CreateScreen,self).__init__(**kwargs)
+
 
 	def createEntry(self):
 		softwarePackageName = self.ids.softPackage_desc_entry_feild_id_CS.text
@@ -60,8 +66,18 @@ class CreateScreen(Screen):
 			customPopWidget.open()
 
 
+	def mapDrive(self):
+		mapDriveAt = UTIL.mappingNetworkDrive()
+		if mapDriveAt != '':
+			print("It has been mapped at: " + mapDriveAt)
+
 	def createRootDirectory(self):
-		print('Procedure to create root directory under mapped drive')
+		if self.mapDriveAt == '':
+			print("Please click on the Map Network Drive first to map the default network drive first.")
+		else:
+			softwarePackageName = self.ids.softPackage_desc_entry_feild_id_CS.text
+			softwarePackageLocation = self.ids.softPackage_url_repo_entry_feild_id_CS.text
+			print("Create a folder under root directory with software package name")
 
 class ApplicationControlScreen(Screen):
 	pass
@@ -70,6 +86,9 @@ class ApplicationControlScreen(Screen):
 
 	def fetchAndChangeScreen(self):
 		sm.current = 'DisplayResultsScreen'
+
+class CreateNewTestSuitScreen(Screen):
+	pass
 
 class myButton(Button):
 	background_color_normal = list([.5,.2,.2,1])
@@ -141,7 +160,12 @@ class DisplayPackagesDetailsScreen(Screen):
 		print("Creating folder under mapped network drive with software package name")
 
 	def mapNetworkDrive(self):
-		print("Mapping network drive to framework")
+		if mapDriveAt != '':
+			mapDriveAt = UTIL.mappingNetworkDrive()
+			if mapDriveAt != '':
+				print("It has been mapped at: " + mapDriveAt)
+
+			
 
 
 	def callback(self):

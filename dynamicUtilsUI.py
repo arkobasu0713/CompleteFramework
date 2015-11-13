@@ -15,7 +15,75 @@ import dataConnect as DBConn
 from functools import partial as Par
 from kivy.uix.popup import Popup
 from screenClasses import *
+import platform
+import argparse
+import sys
+import os
+import time
+import platform
+import subprocess
+import shutil
 
+def mappingNetworkDrive():
+	print("Current OS the script is running on: " + str(platform.system()))
+	if platform.system() == 'Windows':
+		
+		#formatting the command string for mapping the network drive
+		commandString = "net use q: \\nserver.hgst.com\ISOs\iso2usb"
+
+		username = input("Enter username(optional): ")
+		password = input("Enter password(optional): ")
+
+		if username and password != '':
+			commandString = commandString + "/user:" + username + " " + password
+		else:
+			print("Error in username password. Going ahaed with deafult values") #needs to be worked upon
+		
+		print("Cmd String: " + commandString)
+		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
+		output, err = p.communicate()
+		if output.decode('ascii') == '':
+			print("Mapping network drive was unsuccessful")
+			print(err.decode('ascii'))
+			return ''
+		else:
+			print("Mapping network drive was successful")
+			return "q:"
+
+
+	elif platform.system() == 'Linux':
+		
+		#formatting the command string for mapping the network drive
+		commandString = "mount -t cifs -w //nserver.hgst.com/ISOs/iso2usb"
+		print("Creating mount location within directory structure.")
+		mountLocation = os.path.join(os.getcwd(),("mountLocation"+str(time.strftime("%Y-%m-%d"))))
+		print("Mount location being used: " + mountLocation)
+		commandString = commandString + " " + mountLocation
+		if not os.path.exists(mountLocation):
+			print("Path doesn't exist. Creating Mount location")
+			try:
+				os.mkdir(mountLocation)
+			except OSError as exc:
+				if exc.errno == errno.EEXIST and os.path.isdir(mountLocation):
+					pass
+				else: raise
+		print("Mounting network drive with default values") #needs to be worked upon
+		commandString = commandString + " -o username=disty,password=sitlab"
+		
+		print("Cmd String: " + commandString)
+		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
+		output, err = p.communicate()
+		if output.decode('ascii') == '' and err.decode('ascii') == '':
+			print("Mapping network drive was successful")
+			return mountLocation
+		else:
+			print("Mapping network drive was unsuccessful")
+			print(err.decode('ascii'))
+			return ''
+
+	else:
+		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
+		return ''
 	
 def processNewEntrySoftPackage(softPackageName,softwarePackageLocation):
 	#dbROWS

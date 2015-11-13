@@ -27,13 +27,17 @@ from screenClasses import *
 Builder.load_file("appScript2.kv")
 class AutomatedFrameworkForSoftwareTesting(App):
 	def build(self):
+		self.mapDriveAt = ''
 		sm.add_widget(WelcomeScreen(name='WelcomeScreen'))
 		sm.add_widget(ApplicationControlScreen(name='ApplicationConsole'))
 		sm.add_widget(DisplayResultsScreen(name='DisplayResultsScreen'))
 		sm.add_widget(CreateScreen(name='Create'))
+		sm.add_widget(CreateArgumentScreen(name='CreateArgumentScreen'))
+		sm.add_widget(CreateNewTestSuitScreen(name='CreateNewTestSuitScreen'))
 		return sm
 	
 if __name__ == '__main__':
-	AutomatedFrameworkForSoftwareTesting().run()
+	app = AutomatedFrameworkForSoftwareTesting()
+	app.run()
 
 
