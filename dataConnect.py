@@ -2,6 +2,44 @@ import os
 import database as db
 import mysql.connector as MConn
 import subprocess
+import random
+import argparse
+import sys
+import os
+import time
+import platform
+
+def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
+	generateSoftPackID = random.randint(0,9999)
+	currDate = time.strftime("%Y-%m-%d")
+	loadMethod = 'GUI'
+	add_software_pack_query = ("INSERT INTO SOFTWARE_PACKAGE_LOAD VALUES (%(softPackID)s,%(softPackageName)s,%(currDate)s,%(loadMethod)s,%(softwarePackageLocation)s,%(depMod)s)")
+	data = {'softPackID': generateSoftPackID, 'softPackageName': softPackageName, 'currDate': currDate, 'loadMethod': loadMethod, 'softwarePackageLocation': softwarePackageLocation, 'depMod': 0,}
+	try:
+		conn.cursor.execute(add_software_pack_query,data)
+		conn.cnx.commit()
+	except mysql.connector.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		return e
+	else:
+		return 'Success'
+
+def processNewEntryCommand(commandName,conn,hasMand,hasOpt):
+	addCommandQuery = ("INSERT INTO SOFTWARE_COMMANDS VALUES (%(softPackID)s,%(commandID)s,%(commandName)s,%(hasMand)s,%(hasOpt)s)")
+	data = {'softPackID':conn.softwarePackageID,'commandID':None,'commandName': commandName,'hasMand':hasMand,'hasOpt':hasOpt,}
+	try:
+		conn.cursor.execute(addCommandQuery,data)
+		conn.cnx.commit()
+	except mysql.connector.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		return e
+	else:
+		return 'Success'
+
 
 def RunScript(commandString):
 
@@ -118,8 +156,6 @@ class enterDBSpace():
 			for i in range(len(argID)):
 				self.dictOfArguments[argID[i]] = arg[i]
 
-
-#		print(self.dictOfCommandArguments)
 			
 
 

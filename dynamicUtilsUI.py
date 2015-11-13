@@ -15,7 +15,6 @@ import dataConnect as DBConn
 from functools import partial as Par
 from kivy.uix.popup import Popup
 from screenClasses import *
-import platform
 import argparse
 import sys
 import os
@@ -85,22 +84,7 @@ def mappingNetworkDrive():
 		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
 		return ''
 	
-def processNewEntrySoftPackage(softPackageName,softwarePackageLocation):
-	#dbROWS
-	#softwarePackageID
-	generateSoftPackID = randint(0,9999)
-	#date
-	currDate = time.strftime("%Y-%m-%d")
-	#method of LOAD
-	loadMethod = 'GUI'
 
-
-	#query:
-	add_software_pack_query = ("INSERT INTO SOFTWARE_PACKAGE_LOAD VALUES (%(softPackID)s,%(softPackageName)s,%(currDate)s,%(loadMethod)s,%(softwarePackageLocation)s,%(depMod)s)")
-	data = {'softPackID': generateSoftPackID, 'softPackageName': softPackageName, 'currDate': currDate, 'loadMethod': loadMethod, 'softwarePackageLocation': softwarePackageLocation, 'depMod': 0,}
-
-	conn.cursor.execute(add_software_pack_query,data)
-	conn.cnx.commit()
 
 def fetchLogFilePath():
 	logFilePath = os.path.join(os.path.dirname(__file__),'DefaultLogFilePath')
@@ -184,3 +168,26 @@ def createPopupWidget2(sm,dictOfStatus,size):
 
 	return popup1
 
+def createP1(*args):
+	stat = args[0]
+	
+	mainBox = BoxLayout(orientation='vertical')
+	label = Label(text=stat, color=(1,0,0,1))
+	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.25))
+	btn_ok = Button(text='Ok',background_color=(1,0,0,1), size_hint=(.7,1))
+	
+
+	innerButtonControlBox.add_widget(btn_ok)
+
+	mainBox.add_widget(label)
+	if stat != 'Success':
+		err = args[1]
+		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1))
+		mainBox.add_widget(label2)
+
+	mainBox.add_widget(innerButtonControlBox)
+
+	popup1 = Popup(title='Saving Command', content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False)
+	btn_ok.bind(on_press=popup1.dismiss)
+	
+	return popup1

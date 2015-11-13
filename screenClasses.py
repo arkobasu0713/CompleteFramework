@@ -29,17 +29,49 @@ global mapDriveAt
 mapDriveAt = ''
 
 
-class MyCustomPopupWidget(Popup):
+class CreateCommandScreen(Screen):
 	pass
 	def __init__(self,**kwargs):
-		super(MyCustomPopupWidget,self).__init__(**kwargs)
-		print("In myCustomPopupWidget")
+		super(CreateCommandScreen,self).__init__(**kwargs)
+		self.hasMand = 0
+		self.hasOpt = 0
 
-	def on_press_ok(self,*args):
-		self.dismiss
-		UTIL.backApp(sm)
+	def addArgument(self):
+		print("Popup for adding argument")
 
-class CreateArgumentScreen(Screen):
+
+	def saveCommand(self):
+		commandName = self.ids.id_command_name_entry_CCS.text
+		if commandName != '':
+			ret = DBConn.processNewEntryCommand(commandName,conn,self.hasMand,self.hasOpt)
+			print(ret)
+			if ret == 'Success':
+				popup = UTIL.createP1('Success')
+				popup.open()
+			else:
+				popup = UTIL.createP1('Failure',ret)
+				popup.open()
+		else:
+			print("Enter command name")
+
+
+class EditCommandScreen(Screen):
+	def __init__(self,**kwargs):
+		super(EditCommandScreen,self).__init__(**kwargs)
+
+		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
+
+		self.ids.grid_id_commands_ECS.clear_widgets()
+		for eachCommand in conn.dictOfCommands:
+			idString = "button_id_" +str(eachCommand) + "_DPDS"
+			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
+			btn_temp.bind(on_press=Par(self.editCommand,eachCommand,idString))
+
+	def editCommand(self,*args):
+		print("Editting COmmand")
+
+class EditTestSuitScreen(Screen):
 	pass
 
 class WelcomeScreen(Screen):
@@ -57,7 +89,7 @@ class CreateScreen(Screen):
 		softwarePackageName = self.ids.softPackage_desc_entry_feild_id_CS.text
 		softwarePackageLocation = self.ids.softPackage_url_repo_entry_feild_id_CS.text
 		if softwarePackageName != '':
-			UTIL.processNewEntrySoftPackage(softwarePackageName,softwarePackageLocation)
+			DBConn.processNewEntrySoftPackage(softwarePackageName,softwarePackageLocation,conn)
 			customPopWidget = UTIL.createPopupWidget1(sm,'Success')
 			customPopWidget.open()
 		else:
@@ -65,11 +97,6 @@ class CreateScreen(Screen):
 			customPopWidget = UTIL.createPopupWidget1(sm,'Wrong Try')
 			customPopWidget.open()
 
-
-	def mapDrive(self):
-		mapDriveAt = UTIL.mappingNetworkDrive()
-		if mapDriveAt != '':
-			print("It has been mapped at: " + mapDriveAt)
 
 	def createRootDirectory(self):
 		if self.mapDriveAt == '':
@@ -159,18 +186,24 @@ class DisplayPackagesDetailsScreen(Screen):
 	def createFolder(self):
 		print("Creating folder under mapped network drive with software package name")
 
-	def mapNetworkDrive(self):
-		if mapDriveAt != '':
-			mapDriveAt = UTIL.mappingNetworkDrive()
-			if mapDriveAt != '':
-				print("It has been mapped at: " + mapDriveAt)
-
-			
-
-
+	
 	def callback(self):
 		sm.add_widget(DisplayResultsScreen(name='DisplayResultsScreen'))
 		sm.current = 'DisplayResultsScreen'
+
+	def goToEditScreen(self):
+		sm.add_widget(EditCommandScreen(name='EditCommandScreen'))
+		sm.current = 'EditCommandScreen'
+
+	def refreshContents(self):
+		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
+
+		self.ids.grid_id_commands_DPDS.clear_widgets()
+		for eachCommand in conn.dictOfCommands:
+			idString = "button_id_" +str(eachCommand) + "_DPDS"
+			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			self.ids.grid_id_commands_DPDS.add_widget(btn_temp)
+			btn_temp.bind(on_press=Par(self.addSelection, eachCommand,idString))
 		
 class DisplayResultsScreen(Screen):
 	def __init__(self,**kwargs):
