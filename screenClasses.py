@@ -135,7 +135,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		super(DisplayPackagesDetailsScreen,self).__init__(**kwargs)
 		self.buttonIDList = []
 		self.runScript = 'N'
-
+		self.ids.label_id1_DPDS.text = 'Commands and Test Suits for software package: ' + conn.softwarePackage
 		self.comSelect = []
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
