@@ -8,6 +8,7 @@ import sys
 import os
 import time
 import platform
+from mysql.connector import errorcode
 
 def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 	generateSoftPackID = random.randint(0,9999)
