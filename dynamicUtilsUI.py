@@ -170,6 +170,7 @@ def createPopupWidget2(sm,dictOfStatus,size):
 
 def createP1(*args):
 	stat = args[0]
+	popupTitle = args[1]
 	
 	mainBox = BoxLayout(orientation='vertical')
 	label = Label(text=stat, color=(1,0,0,1))
@@ -181,13 +182,13 @@ def createP1(*args):
 
 	mainBox.add_widget(label)
 	if stat != 'Success':
-		err = args[1]
+		err = args[2]
 		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1))
 		mainBox.add_widget(label2)
 
 	mainBox.add_widget(innerButtonControlBox)
 
-	popup1 = Popup(title='Saving Command', content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False)
+	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False)
 	btn_ok.bind(on_press=popup1.dismiss)
 	
 	return popup1

@@ -336,18 +336,44 @@
 			text: 'Commands found for the software package:'
 			color: (1,0,0,1)
 			bold: True
-			size_hint: (1,.15)
+			size_hint: (1,.1)
 		GridLayout:
 			id: grid_id_commands_ECS
 			cols: 4
-			size_hint: (1,.45)
+			size_hint: (1,.3)
 		GridLayout:
 			id: grid_id_for_editting_ECS
-		Button:
-			text: 'Back'
-			background_color: (1,0,0,1)
-			on_press: root.manager.current = 'DisplayPackagesDetailsScreen'
+			cols: 2
+			size_hint: (1,.3)
+			GridLayout:
+				id: gridForArgument
+				cols: 4
+
+		BoxLayout:
+			orientation: 'horizontal'
 			size_hint: (1,.15)
+			Button:
+				id: deleteButtonID
+				text: 'Delete'
+				background_color: (1,0,0,1)
+				on_press: root.delete()
+			Button:
+				id: displayArgumentID
+				text: 'Display Arguments'
+				background_color: (1,0,0,1)
+				on_press: root.display()
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1,.15)
+			Button:
+				text: "Refresh Contents"
+				background_color: (1,0,0,1)					
+				on_press: root.refreshContents()
+			Button:
+				text: 'Back'
+				background_color: (1,0,0,1)
+				on_press: 
+					root.manager.current = 'DisplayPackagesDetailsScreen'
 
 <EditTestSuitScreen>:
 	name: 'EditTestSuitScreen'

@@ -19,7 +19,24 @@ def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 	try:
 		conn.cursor.execute(add_software_pack_query,data)
 		conn.cnx.commit()
-	except mysql.connector.Error as e:
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		return e
+	else:
+		return 'Success'
+
+def deleteCommand(conn,commandIDs,softPackageID):
+	deleteCommand_query = ("DELETE FROM SOFTWARE_COMMANDS WHERE COMMAND_ID = %s AND SOFTWARE_PACKAGE_ID = %s")
+	executeData = []
+	print(commandIDs)
+	print(softPackageID)
+	try:
+		for eachCommandID in commandIDs:
+			conn.cursor.execute(deleteCommand_query,[eachCommandID,softPackageID,])
+			conn.cnx.commit()
+	except MConn.Error as e:
 		print("Error code: " + str(e.errno))
 		print("Error Message: " + str(e.msg))
 		print(str(e))
@@ -33,7 +50,7 @@ def processNewEntryCommand(commandName,conn,hasMand,hasOpt):
 	try:
 		conn.cursor.execute(addCommandQuery,data)
 		conn.cnx.commit()
-	except mysql.connector.Error as e:
+	except MConn.Error as e:
 		print("Error code: " + str(e.errno))
 		print("Error Message: " + str(e.msg))
 		print(str(e))
@@ -144,6 +161,8 @@ class enterDBSpace():
 
 	def fetchArgumentsForSelectCommands(self, comSelect):
 		self.comSelect = comSelect
+		self.dictOfCommandArguments = {}
+		self.dictOfArguments = {}
 		for eachCommandID in self.comSelect:
 
 			self.cursor.execute("SELECT ARG.ARGUMENT_ID, ARG.ARGUMENT FROM ARGUMENTS ARG, SOFTWARE_COMMANDS COM WHERE COM.COMMAND_ID = ARG.COMMAND_ID AND COM.SOFTWARE_PACKAGE_ID = ARG.SOFTWARE_PACKAGE_ID AND COM.COMMAND_ID = %s",(eachCommandID,))
@@ -161,6 +180,7 @@ class enterDBSpace():
 
 
 	def retreiveValuesForArguments(self):
+		self.dictOfArgVal = {}
 		for argSet in self.dictOfCommandArguments:
 			for eachArg in self.dictOfCommandArguments[argSet]:
 				self.cursor.execute("select ARGUMENT_VAL_TYPE, DEFAULT_VALUE from ARGUMENT_VALUES WHERE ARGUMENT_ID = %s",(eachArg,))
@@ -187,16 +207,11 @@ class enterDBSpace():
 			writeFile.write(str(self.softwarePackage) + " " + str(self.dictOfCommands[eachCommandID2]))
 			writeFile.write('\n')
 			for eachArg in self.dictOfCommandArguments[eachCommandID2]:
-#				print(eachArg)
 				writeFile.write(str(self.softwarePackage) + ' ' + str(self.dictOfCommands[eachCommandID2]) + ' ' + str(self.dictOfArguments[eachArg]))
 				writeFile.write('\n')
 				for eachArgVal in self.dictOfArgVal[eachArg]:
-#					print(eachArgVal)
 					writeFile.write(str(self.softwarePackage) + ' ' + str(self.dictOfCommands[eachCommandID2]) + ' ' + str(self.dictOfArguments[eachArg]) + ' ' + str(eachArgVal))
 					writeFile.write('\n')
-#				for eachArg in eachArgSet:
-#					print(self.dictOfArguments[eachArg])
-#					file.write(str(self.softwarePackage) + ' ' + str(self.dictOfCommands[eachCommand]) + ' ' + str(self.dictOfArguments[eachArg]))
 
 	def runScripts(self):
 		dictOfStatus = {}

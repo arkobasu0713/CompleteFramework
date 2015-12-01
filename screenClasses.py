@@ -46,10 +46,10 @@ class CreateCommandScreen(Screen):
 			ret = DBConn.processNewEntryCommand(commandName,conn,self.hasMand,self.hasOpt)
 			print(ret)
 			if ret == 'Success':
-				popup = UTIL.createP1('Success')
+				popup = UTIL.createP1('Success','Create Command')
 				popup.open()
 			else:
-				popup = UTIL.createP1('Failure',ret)
+				popup = UTIL.createP1('Failure','Create Command',ret)
 				popup.open()
 		else:
 			print("Enter command name")
@@ -60,16 +60,68 @@ class EditCommandScreen(Screen):
 		super(EditCommandScreen,self).__init__(**kwargs)
 
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
+		self.ids.deleteButtonID.disabled = True
+		self.ids.displayArgumentID.disabled = True
+		self.commandList = []
 
 		self.ids.grid_id_commands_ECS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_DPDS"
 			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
-			btn_temp.bind(on_press=Par(self.editCommand,eachCommand,idString))
+			btn_temp.bind(on_press=Par(self.selectCommand,eachCommand,idString))
 
 	def editCommand(self,*args):
-		print("Editting COmmand")
+		self.ids.deleteButtonID.disabled = False
+
+	def delete(self,*args):
+		ret = DBConn.deleteCommand(conn,self.commandList,conn.softwarePackageID)
+		if ret == 'Success':
+			popup = UTIL.createP1('Success','Delete Command')
+			popup.open()
+		else:
+			popup = UTIL.createP1('Failure','Delete Command',ret)
+			popup.open()
+
+		
+
+	def selectCommand(self,*args):
+		if args[0] not in self.commandList:
+			self.commandList.append(args[0])
+		else:
+			self.commandList.remove(args[0])
+		print(self.commandList)
+		if len(self.commandList) > 0:
+			self.ids.deleteButtonID.disabled = False
+		else:
+			self.ids.deleteButtonID.disabled = True		
+
+		if len(self.commandList) == 1:
+			self.ids.displayArgumentID.disabled = False
+		else:
+			self.ids.displayArgumentID.disabled = True
+
+	def display(self,*args):
+		conn.fetchArgumentsForSelectCommands(self.commandList)
+		print(conn.dictOfCommandArguments)
+		for eachArg in conn.dictOfArguments:
+			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
+			label_tmp = Label(text=str(conn.dictOfArguments[eachArg]),id=idString,background_color=(1,1,0,1))
+			self.ids.grid_id_for_editting_ECS.add_widget(label_tmp)
+
+		
+	def refreshContents(self):
+		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
+		self.commandList = []
+		self.ids.deleteButtonID.disabled = True
+		self.ids.displayArgumentID.disabled = True
+
+		self.ids.grid_id_commands_ECS.clear_widgets()
+		for eachCommand in conn.dictOfCommands:
+			idString = "button_id_" +str(eachCommand) + "_EditScreen"
+			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
+			btn_temp.bind(on_press=Par(self.deleteCommand,eachCommand,idString))
 
 class EditTestSuitScreen(Screen):
 	pass
@@ -127,7 +179,10 @@ class myButton(Button):
 		self.background_down = ""
 		self.background_color = self.background_color_normal
 	def on_press(self):
-		self.background_color = self.background_color_down
+		if self.background_color == self.background_color_down:
+			self.background_color = self.background_color_normal
+		else:
+			self.background_color = self.background_color_down
 
 class DisplayPackagesDetailsScreen(Screen):
 	
