@@ -69,7 +69,7 @@ class EditCommandScreen(Screen):
 		self.ids.grid_id_commands_ECS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_DPDS"
-			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			btn_temp = UTIL.myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
 			btn_temp.bind(on_press=Par(self.selectCommand,eachCommand,idString))
 
@@ -119,7 +119,7 @@ class EditCommandScreen(Screen):
 		print('\n')
 		print(conn.dictOfArgVal2)
 		print('\n')
-		print(conn.dictOfArgumentTypes)
+		print(conn.dictOfCommands)
 #		for eachArg in conn.dictOfArguments:
 #			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
 		label_str = "{numberOfArguments} Arguments Found".format(numberOfArguments=len(conn.dictOfArguments))
@@ -132,7 +132,7 @@ class EditCommandScreen(Screen):
 		pop.open()
 		
 	def addArgument(self):
-		pop = UTIL.createP1("Add argument values below","Add Argument")
+		pop = UTIL.createP1("Add argument values below","Add Argument",conn.dictOfCommands,self.commandList[0],conn)
 		pop.open()
 		
 	def refreshContents(self):
@@ -147,7 +147,7 @@ class EditCommandScreen(Screen):
 		self.ids.boxToDisplayArgumentDetailsID.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_EditScreen"
-			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			btn_temp = UTIL.myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
 			btn_temp.bind(on_press=Par(self.selectCommand,eachCommand,idString))
 
@@ -197,21 +197,6 @@ class ApplicationControlScreen(Screen):
 class CreateNewTestSuitScreen(Screen):
 	pass
 
-class myButton(Button):
-	background_color_normal = list([.5,.2,.2,1])
-	background_color_down = list([1,0,.5,1])
-
-	def __init__(self,**kwargs):
-		super(myButton,self).__init__(**kwargs)
-		self.background_normal = ""
-		self.background_down = ""
-		self.background_color = self.background_color_normal
-	def on_press(self):
-		if self.background_color == self.background_color_down:
-			self.background_color = self.background_color_normal
-		else:
-			self.background_color = self.background_color_down
-
 class DisplayPackagesDetailsScreen(Screen):
 	
 	def __init__(self,**kwargs):
@@ -226,7 +211,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.grid_id_commands_DPDS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_DPDS"
-			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			btn_temp = UTIL.myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_DPDS.add_widget(btn_temp)
 			btn_temp.bind(on_press=Par(self.addSelection, eachCommand,idString))
 		
@@ -284,7 +269,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.grid_id_commands_DPDS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_DPDS"
-			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			btn_temp = UTIL.myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_DPDS.add_widget(btn_temp)
 			btn_temp.bind(on_press=Par(self.addSelection, eachCommand,idString))
 		

@@ -170,12 +170,23 @@ def createPopupWidget2(sm,dictOfStatus,size):
 	
 def displayCommands(*args):
 	print("Display pop-up for commands")
+	popupNew = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
+	popupNew.open()
 	
 def addValues(*args):
 	print("Display pop-up for adding arguments")
 	
 def displayArgumentDetails(*args):
 	print("Display pop-up for each argument details with control of modifying them")
+	
+def processArgEntry(*args):
+	print(args[0])
+	print(args[1])
+	DBConn.processArgEntry()
+	
+def on_text(instance,value):
+	print(value)
+	
 
 def createP1(*args):
 	stat = args[0]
@@ -212,11 +223,32 @@ def createP1(*args):
 		gridlayout.add_widget(txtInpt)
 		btn = Button(text="Click if it imports data from another command",font_size=10)
 		gridlayout.add_widget(btn)
-		btn.bind(on_press=Par(displayCommands))
+		btn.bind(on_press=Par(displayCommands,args[2]))
 		btn_val = Button(text="Click to add Values to the argument",font_size=10,id='valButtonID')
 		gridlayout.add_widget(btn_val)
 		btn_val.bind(on_press=Par(addValues))
 		mainBox.add_widget(gridlayout)
+		btn_save = Button(text="Save to DB",background_color=(1,0,0,1),id="buttonSaveID")
+		innerButtonControlBox.add_widget(btn_save)
+		btn_save.bind(on_press=Par(DBConn.processArgEntry,txtInpt,args[3],args[4]))
+		
+		
+	if popupTitle == 'Commands':
+		gridlayout = GridLayout(cols=3,id="gridIDPopUP")
+		for eachCommand in args[2]:
+			idString = "button_id_" +str(eachCommand) + "_EDITScreen"
+			btn_tmp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
+			gridlayout.add_widget(btn_tmp)
+		mainBox.add_widget(gridlayout)
+		gridlayout2 = GridLayout(cols=2,size_hint=(1,.3))
+		label = Label(text="Import Tag: ",color=(1,0,0,1))
+		txtInpt2 = TextInput(id="textInputForImportTagID")
+		gridlayout2.add_widget(label)
+		gridlayout2.add_widget(txtInpt2)
+		mainBox.add_widget(gridlayout2)
+		btn_save = Button(text="Save to DB",background_color=(1,0,0,1),id="buttonSaveID")
+		innerButtonControlBox.add_widget(btn_save)
+		#btn_save.bind(on_press=Par(processArgEntry,label.text))
 		
 	
 	mainBox.add_widget(innerButtonControlBox)
@@ -225,3 +257,18 @@ def createP1(*args):
 	btn_ok.bind(on_press=popup1.dismiss)
 	
 	return popup1
+	
+class myButton(Button):
+	background_color_normal = list([.5,.2,.2,1])
+	background_color_down = list([1,0,.5,1])
+
+	def __init__(self,**kwargs):
+		super(myButton,self).__init__(**kwargs)
+		self.background_normal = ""
+		self.background_down = ""
+		self.background_color = self.background_color_normal
+	def on_press(self):
+		if self.background_color == self.background_color_down:
+			self.background_color = self.background_color_normal
+		else:
+			self.background_color = self.background_color_down

@@ -26,7 +26,28 @@ def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 		return e
 	else:
 		return 'Success'
-
+def processArgEntry(*args):
+	print("Processing Argument Entry")
+	commandID = int(args[1])
+	arg = args[0]
+	conn = args[2]
+	print(arg.text)
+	print(commandID)
+	softPackID = conn.softwarePackageID
+	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
+	data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': None, 'importsTag':None,}
+	try:
+		if arg.text != None and arg.text != "":
+			print(data)
+			conn.cursor.execute(query,data)
+			conn.cnx.commit()
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+	else:
+		print('Success')
+	
 def deleteCommand(conn,commandIDs,softPackageID):
 	deleteCommand_query = ("DELETE FROM SOFTWARE_COMMANDS WHERE COMMAND_ID = %s AND SOFTWARE_PACKAGE_ID = %s")
 	executeData = []
