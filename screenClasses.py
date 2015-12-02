@@ -61,7 +61,9 @@ class EditCommandScreen(Screen):
 
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 		self.ids.deleteButtonID.disabled = True
+		self.ids.diplayArgDetailButtonID.disabled = True
 		self.ids.displayArgumentID.disabled = True
+		self.ids.addArgumentButtonID.disabled = True
 		self.commandList = []
 
 		self.ids.grid_id_commands_ECS.clear_widgets()
@@ -98,30 +100,50 @@ class EditCommandScreen(Screen):
 
 		if len(self.commandList) == 1:
 			self.ids.displayArgumentID.disabled = False
+			self.ids.addArgumentButtonID.disabled = False
+			#self.ids.diplayArgDetailButtonID.disabled = False
 		else:
 			self.ids.displayArgumentID.disabled = True
-
-	def display(self,*args):
+			self.ids.addArgumentButtonID.disabled = True
+			self.ids.diplayArgDetailButtonID.disabled = True
+			
+	def query(self,*args):
+		self.ids.boxToDisplayArgumentDetailsID.clear_widgets()
 		conn.fetchArgumentsForSelectCommands(self.commandList)
+		conn.retreiveValuesForArguments()
 		print(conn.dictOfCommandArguments)
-		for eachArg in conn.dictOfArguments:
-			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
-			label_tmp = Label(text=str(conn.dictOfArguments[eachArg]),id=idString,background_color=(1,1,0,1))
-			self.ids.grid_id_for_editting_ECS.add_widget(label_tmp)
-
+		print(conn.dictOfArgVal)
+		print(conn.dictOfArguments)
+#		for eachArg in conn.dictOfArguments:
+#			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
+		label_str = "{numberOfArguments} Arguments Found".format(numberOfArguments=len(conn.dictOfArguments))
+		label_tmp = Label(text=label_str,background_color=(1,1,0,1),multiline=True)
+		self.ids.boxToDisplayArgumentDetailsID.add_widget(label_tmp)
+		self.ids.diplayArgDetailButtonID.disabled = False
+		
+	def displayDetail(self):
+		pop = UTIL.createP1("Here are the Arguments and their values","Argument Details",conn.dictOfArguments,conn.dictOfArgVal)
+		pop.open()
+		
+	def addArgument(self):
+		pop = UTIL.createP1("Add argument values below","Add Argument")
+		pop.open()
 		
 	def refreshContents(self):
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 		self.commandList = []
 		self.ids.deleteButtonID.disabled = True
 		self.ids.displayArgumentID.disabled = True
-
+		self.ids.diplayArgDetailButtonID.disabled = True
+		self.ids.addArgumentButtonID.disabled = True
+		
 		self.ids.grid_id_commands_ECS.clear_widgets()
+		self.ids.boxToDisplayArgumentDetailsID.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_EditScreen"
 			btn_temp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			self.ids.grid_id_commands_ECS.add_widget(btn_temp)
-			btn_temp.bind(on_press=Par(self.deleteCommand,eachCommand,idString))
+			btn_temp.bind(on_press=Par(self.selectCommand,eachCommand,idString))
 
 class EditTestSuitScreen(Screen):
 	pass

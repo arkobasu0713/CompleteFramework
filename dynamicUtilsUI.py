@@ -167,25 +167,54 @@ def createPopupWidget2(sm,dictOfStatus,size):
 	btn_cancel.bind(on_press=Par(backApp1,sm))
 
 	return popup1
+	
+def displayCommands(*args):
+	print("Display pop-up for commands")
+	
+def addValues(*args):
+	print("Display pop-up for adding arguments")
 
 def createP1(*args):
 	stat = args[0]
 	popupTitle = args[1]
 	
 	mainBox = BoxLayout(orientation='vertical')
-	label = Label(text=stat, color=(1,0,0,1))
-	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.25))
-	btn_ok = Button(text='Ok',background_color=(1,0,0,1), size_hint=(.7,1))
+	label = Label(text=stat, color=(1,0,0,1),size_hint=(1,.15))
+	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.15))
+	btn_ok = Button(text='Ok',background_color=(1,0,0,1))
 	
 
 	innerButtonControlBox.add_widget(btn_ok)
-
 	mainBox.add_widget(label)
-	if stat != 'Success':
+	
+	if stat == 'Failure':
 		err = args[2]
 		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1))
 		mainBox.add_widget(label2)
+		
+	if popupTitle == 'Argument Details':
+		gridlayout = GridLayout(cols=2)
+		for eachArg in args[2]:
+			string = "Argument:  {arg}\nArgument Values: ".format(arg=args[2][eachArg])
+			label = Label(text=string,multiline=True,color=(1,0,0,1))
+			gridlayout.add_widget(label)
+		mainBox.add_widget(gridlayout)
 
+	if popupTitle == 'Add Argument':
+		gridlayout = GridLayout(cols=2)
+		label1 = Label(text="Argument Description: ",color=(1,0,0,1))
+		gridlayout.add_widget(label1)
+		txtInpt = TextInput(id='textInputForArgumentID')
+		gridlayout.add_widget(txtInpt)
+		btn = Button(text="Click if it imports data from another command",font_size=10)
+		gridlayout.add_widget(btn)
+		btn.bind(on_press=Par(displayCommands))
+		btn_val = Button(text="Click to add Values to the argument",font_size=10,id='valButtonID')
+		gridlayout.add_widget(btn_val)
+		btn_val.bind(on_press=Par(addValues))
+		mainBox.add_widget(gridlayout)
+		
+	
 	mainBox.add_widget(innerButtonControlBox)
 
 	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False)

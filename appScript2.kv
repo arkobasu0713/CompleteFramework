@@ -341,13 +341,13 @@
 			id: grid_id_commands_ECS
 			cols: 4
 			size_hint: (1,.3)
-		GridLayout:
-			id: grid_id_for_editting_ECS
-			cols: 2
+		BoxLayout:
+			id: boxToDisplayArgumentDetailsID
+			orientation: 'vertical'
 			size_hint: (1,.3)
-			GridLayout:
-				id: gridForArgument
-				cols: 4
+			Button:
+				
+			
 
 		BoxLayout:
 			orientation: 'horizontal'
@@ -357,11 +357,25 @@
 				text: 'Delete'
 				background_color: (1,0,0,1)
 				on_press: root.delete()
-			Button:
-				id: displayArgumentID
-				text: 'Display Arguments'
-				background_color: (1,0,0,1)
-				on_press: root.display()
+			GridLayout:
+				id: gridForControlButtonsOfArgID
+				cols: 3
+				rows: 2
+				Button:
+					id: displayArgumentID
+					text: 'Query Arguments'
+					background_color: (1,0,0,1)
+					on_press: root.query()
+				Button:
+					id: diplayArgDetailButtonID
+					text: 'Display Arg Detail'
+					background_color: (1,0,0,1)
+					on_press: root.displayDetail()
+				Button:
+					id: addArgumentButtonID
+					text: 'Add Argument'
+					background_color: (1,0,0,1)
+					on_press: root.addArgument()
 		BoxLayout:
 			orientation: 'horizontal'
 			size_hint: (1,.15)
