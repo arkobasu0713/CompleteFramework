@@ -173,13 +173,16 @@ def displayCommands(*args):
 	
 def addValues(*args):
 	print("Display pop-up for adding arguments")
+	
+def displayArgumentDetails(*args):
+	print("Display pop-up for each argument details with control of modifying them")
 
 def createP1(*args):
 	stat = args[0]
 	popupTitle = args[1]
 	
 	mainBox = BoxLayout(orientation='vertical')
-	label = Label(text=stat, color=(1,0,0,1),size_hint=(1,.15))
+	label = Label(text=stat, color=(1,1,0,1),size_hint=(1,.15))
 	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.15))
 	btn_ok = Button(text='Ok',background_color=(1,0,0,1))
 	
@@ -195,9 +198,10 @@ def createP1(*args):
 	if popupTitle == 'Argument Details':
 		gridlayout = GridLayout(cols=2)
 		for eachArg in args[2]:
-			string = "Argument:  {arg}\nArgument Values: ".format(arg=args[2][eachArg])
-			label = Label(text=string,multiline=True,color=(1,0,0,1))
-			gridlayout.add_widget(label)
+			string = "{arg}".format(arg=args[2][eachArg])
+			btn = Button(text=string,id=str("btn"+str(args[2][eachArg])+"ID"))
+			gridlayout.add_widget(btn)
+			btn.bind(on_press=Par(displayArgumentDetails))
 		mainBox.add_widget(gridlayout)
 
 	if popupTitle == 'Add Argument':

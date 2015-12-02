@@ -112,8 +112,14 @@ class EditCommandScreen(Screen):
 		conn.fetchArgumentsForSelectCommands(self.commandList)
 		conn.retreiveValuesForArguments()
 		print(conn.dictOfCommandArguments)
+		print('\n')
 		print(conn.dictOfArgVal)
+		print('\n')
 		print(conn.dictOfArguments)
+		print('\n')
+		print(conn.dictOfArgVal2)
+		print('\n')
+		print(conn.dictOfArgumentTypes)
 #		for eachArg in conn.dictOfArguments:
 #			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
 		label_str = "{numberOfArguments} Arguments Found".format(numberOfArguments=len(conn.dictOfArguments))
@@ -122,7 +128,7 @@ class EditCommandScreen(Screen):
 		self.ids.diplayArgDetailButtonID.disabled = False
 		
 	def displayDetail(self):
-		pop = UTIL.createP1("Here are the Arguments and their values","Argument Details",conn.dictOfArguments,conn.dictOfArgVal)
+		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Argument Details",conn.dictOfArguments,conn.dictOfArgVal)
 		pop.open()
 		
 	def addArgument(self):

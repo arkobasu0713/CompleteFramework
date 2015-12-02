@@ -135,6 +135,8 @@ class enterDBSpace():
 		self.softwarePackageID = 0
 		self.fileNames = []
 		self.dictOfFileNames = {}
+		self.dictOfArgumentTypes = {}
+		self.dictOfArgVal2 = {}
 
 	def reEstablishConnection(self):
 		self.cnx.close()
@@ -181,15 +183,19 @@ class enterDBSpace():
 
 	def retreiveValuesForArguments(self):
 		self.dictOfArgVal = {}
+		self.dictOfArgVal2 = {}
 		for argSet in self.dictOfCommandArguments:
 			for eachArg in self.dictOfCommandArguments[argSet]:
+				self.dictOfArgumentTypes = {}
 				self.cursor.execute("select ARGUMENT_VAL_TYPE, DEFAULT_VALUE from ARGUMENT_VALUES WHERE ARGUMENT_ID = %s",(eachArg,))
 				data = self.cursor.fetchall()
 				listOfValues=[]
 				for eachValType, defVal in data:
 					if eachValType in ['ABP','STR']:
 						listOfValues.append(defVal)
+					self.dictOfArgumentTypes[eachValType] = defVal
 				self.dictOfArgVal[eachArg] = listOfValues
+				self.dictOfArgVal2[eachArg] = self.dictOfArgumentTypes
 
 	def createScripts(self,logFilePath,comSelect):
 		self.outputLocation = createOutputLogDirectory(logFilePath)
