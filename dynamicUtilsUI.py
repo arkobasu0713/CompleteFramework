@@ -28,7 +28,7 @@ def mappingNetworkDrive():
 	if platform.system() == 'Windows':
 		
 		#formatting the command string for mapping the network drive
-		commandString = "net use q: \\nserver.hgst.com\ISOs\iso2usb"
+		commandString = "net use q: \\\\nserver.hgst.com\ISOs\iso2usb"
 
 		username = input("Enter username(optional): ")
 		password = input("Enter password(optional): ")

@@ -41,6 +41,8 @@ def processArgEntry(*args):
 			print(data)
 			conn.cursor.execute(query,data)
 			conn.cnx.commit()
+		else:
+			print("No Update.")
 	except MConn.Error as e:
 		print("Error code: " + str(e.errno))
 		print("Error Message: " + str(e.msg))
