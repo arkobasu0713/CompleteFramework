@@ -169,10 +169,9 @@ def createPopupWidget2(sm,dictOfStatus,size):
 	return popup1
 	
 def displayCommands(*args):
-	print("Display pop-up for commands")
 	popupNew = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
 	popupNew.open()
-	
+		
 def addValues(*args):
 	print("Display pop-up for adding arguments")
 	
@@ -184,18 +183,29 @@ def processArgEntry(*args):
 	print(args[1])
 	DBConn.processArgEntry()
 	
-def on_text(instance,value):
-	print(value)
+def disableOthers(*args):
+	gridlayout = args[0]
+	gridIDPopUP = args[1]
+	idString = args[2]
+	for children in gridlayout.children:
+		if children.id != idString:
+			if children.disabled == True:
+				children.disabled = False
+			else:
+				children.disabled = True
+				
+def validateCommandImport(*args):
+	print("Validate import procedure")
 	
 
 def createP1(*args):
 	stat = args[0]
 	popupTitle = args[1]
 	
-	mainBox = BoxLayout(orientation='vertical')
-	label = Label(text=stat, color=(1,1,0,1),size_hint=(1,.15))
-	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.15))
-	btn_ok = Button(text='Ok',background_color=(1,0,0,1))
+	mainBox = BoxLayout(orientation='vertical',id="mainBoxID")
+	label = Label(text=stat, color=(1,1,0,1),size_hint=(1,.15),id="labelID")
+	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.15),id="innerButtonControlBoxID")
+	btn_ok = Button(text='Ok',background_color=(1,0,0,1),id="btn_okID")
 	
 
 	innerButtonControlBox.add_widget(btn_ok)
@@ -203,11 +213,11 @@ def createP1(*args):
 	
 	if stat == 'Failure':
 		err = args[2]
-		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1))
+		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1),id="label2ID")
 		mainBox.add_widget(label2)
 		
 	if popupTitle == 'Argument Details':
-		gridlayout = GridLayout(cols=2)
+		gridlayout = GridLayout(cols=2,id="gridlayoutID")
 		for eachArg in args[2]:
 			string = "{arg}".format(arg=args[2][eachArg])
 			btn = Button(text=string,id=str("btn"+str(args[2][eachArg])+"ID"))
@@ -216,12 +226,12 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 
 	if popupTitle == 'Add Argument':
-		gridlayout = GridLayout(cols=2)
-		label1 = Label(text="Argument Description: ",color=(1,0,0,1))
+		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(1,.5))
+		label1 = Label(text="Argument Description: ",color=(1,0,0,1),id="label1ID")
 		gridlayout.add_widget(label1)
 		txtInpt = TextInput(id='textInputForArgumentID')
 		gridlayout.add_widget(txtInpt)
-		btn = Button(text="Click if it imports data from another command",font_size=10)
+		btn = Button(text="Click if it imports data from another command",font_size=10,id="btnID")
 		gridlayout.add_widget(btn)
 		btn.bind(on_press=Par(displayCommands,args[2]))
 		btn_val = Button(text="Click to add Values to the argument",font_size=10,id='valButtonID')
@@ -239,22 +249,24 @@ def createP1(*args):
 			idString = "button_id_" +str(eachCommand) + "_EDITScreen"
 			btn_tmp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			gridlayout.add_widget(btn_tmp)
+			btn_tmp.bind(on_press=Par(disableOthers,gridlayout,"gridIDPopUP",idString))
 		mainBox.add_widget(gridlayout)
-		gridlayout2 = GridLayout(cols=2,size_hint=(1,.3))
-		label = Label(text="Import Tag: ",color=(1,0,0,1))
+		gridlayout2 = GridLayout(cols=2,size_hint=(1,.3),id="gridlayout2ID")
+		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
 		txtInpt2 = TextInput(id="textInputForImportTagID")
-		gridlayout2.add_widget(label)
+		gridlayout2.add_widget(labelImport)
 		gridlayout2.add_widget(txtInpt2)
 		mainBox.add_widget(gridlayout2)
-		btn_save = Button(text="Save to DB",background_color=(1,0,0,1),id="buttonSaveID")
-		innerButtonControlBox.add_widget(btn_save)
-		#btn_save.bind(on_press=Par(processArgEntry,label.text))
 		
 	
+	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
+	innerButtonControlBox.add_widget(btn_cancel)
 	mainBox.add_widget(innerButtonControlBox)
 
-	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False)
-	btn_ok.bind(on_press=popup1.dismiss)
+	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False,id="Popup1ID")
+	btn_ok.bind(on_press=Par(validateCommandImport,popup1))
+	btn_ok.bind(on_release=popup1.dismiss)
+	btn_cancel.bind(on_press=popup1.dismiss)
 	
 	return popup1
 	
