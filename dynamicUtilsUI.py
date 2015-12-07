@@ -23,6 +23,8 @@ import platform
 import subprocess
 import shutil
 
+global control
+control = 0
 def mappingNetworkDrive():
 	print("Current OS the script is running on: " + str(platform.system()))
 	if platform.system() == 'Windows':
@@ -169,11 +171,15 @@ def createPopupWidget2(sm,dictOfStatus,size):
 	return popup1
 	
 def displayCommands(*args):
-	popupNew = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
+	btn = args[1]
+	popupNew, grid, txtInpt2 = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
 	popupNew.open()
+	par = Par(validateCommandImport,grid, txtInpt2, btn)
+	popupNew.bind(on_dismiss=par)
 		
 def addValues(*args):
-	print("Display pop-up for adding arguments")
+	print("Display pop-up for adding argument values")
+	popup = createP1("Enter Argument values","Arguments")
 	
 def displayArgumentDetails(*args):
 	print("Display pop-up for each argument details with control of modifying them")
@@ -185,8 +191,7 @@ def processArgEntry(*args):
 	
 def disableOthers(*args):
 	gridlayout = args[0]
-	gridIDPopUP = args[1]
-	idString = args[2]
+	idString = args[1]
 	for children in gridlayout.children:
 		if children.id != idString:
 			if children.disabled == True:
@@ -196,7 +201,23 @@ def disableOthers(*args):
 				
 def validateCommandImport(*args):
 	print("Validate import procedure")
-	
+	gridLayout = args[0]
+	txtBox = args[1]
+	btn = args[2]
+	count = 0 
+	child = None
+	for children in gridLayout.children:
+		if children.disabled == False:
+			count = count + 1
+			child = children
+	if count == 1:
+		print(child)
+		print(child.text)
+		print("Commandid: " + child.id)
+		print(txtBox.text)
+		btn.background_color = list([1,0,.5,1])
+	else:
+		btn.background_color = list([1,1,1,1])
 
 def createP1(*args):
 	stat = args[0]
@@ -231,10 +252,10 @@ def createP1(*args):
 		gridlayout.add_widget(label1)
 		txtInpt = TextInput(id='textInputForArgumentID')
 		gridlayout.add_widget(txtInpt)
-		btn = Button(text="Click if it imports data from another command",font_size=10,id="btnID")
+		btn = Button(text="Click if it imports data from another command",font_size=12,id="btnID")
 		gridlayout.add_widget(btn)
-		btn.bind(on_press=Par(displayCommands,args[2]))
-		btn_val = Button(text="Click to add Values to the argument",font_size=10,id='valButtonID')
+		btn.bind(on_press=Par(displayCommands,args[2],btn))
+		btn_val = Button(text="Click to add Values to the argument",font_size=12,id='valButtonID')
 		gridlayout.add_widget(btn_val)
 		btn_val.bind(on_press=Par(addValues))
 		mainBox.add_widget(gridlayout)
@@ -246,10 +267,10 @@ def createP1(*args):
 	if popupTitle == 'Commands':
 		gridlayout = GridLayout(cols=3,id="gridIDPopUP")
 		for eachCommand in args[2]:
-			idString = "button_id_" +str(eachCommand) + "_EDITScreen"
+			idString = str(eachCommand)
 			btn_tmp = myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))
 			gridlayout.add_widget(btn_tmp)
-			btn_tmp.bind(on_press=Par(disableOthers,gridlayout,"gridIDPopUP",idString))
+			btn_tmp.bind(on_press=Par(disableOthers,gridlayout,idString))
 		mainBox.add_widget(gridlayout)
 		gridlayout2 = GridLayout(cols=2,size_hint=(1,.3),id="gridlayout2ID")
 		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
@@ -258,17 +279,21 @@ def createP1(*args):
 		gridlayout2.add_widget(txtInpt2)
 		mainBox.add_widget(gridlayout2)
 		
-	
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
+	
 	innerButtonControlBox.add_widget(btn_cancel)
 	mainBox.add_widget(innerButtonControlBox)
 
 	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False,id="Popup1ID")
-	btn_ok.bind(on_press=Par(validateCommandImport,popup1))
+	if popup1.title =='Commands':
+		g = [gridlayout,txtInpt2]
+
 	btn_ok.bind(on_release=popup1.dismiss)
 	btn_cancel.bind(on_press=popup1.dismiss)
-	
-	return popup1
+	if popupTitle == 'Commands':
+		return popup1, gridlayout,txtInpt2
+	else:
+		return popup1
 	
 class myButton(Button):
 	background_color_normal = list([.5,.2,.2,1])
