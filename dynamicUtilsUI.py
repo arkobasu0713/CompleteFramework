@@ -177,6 +177,8 @@ def displayCommands(*args):
 	par = Par(validateCommandImport,grid, txtInpt2, btn)
 	popupNew.bind(on_dismiss=par)
 		
+		
+
 def addValues(*args):
 	print("Display pop-up for adding argument values")
 	popup = createP1("Enter Argument values","Arguments")
@@ -198,7 +200,12 @@ def disableOthers(*args):
 				children.disabled = False
 			else:
 				children.disabled = True
-				
+
+def enableAll(*args):
+	grid = args[0]
+	for children in grid.children:
+		children.disabled = False
+		
 def validateCommandImport(*args):
 	print("Validate import procedure")
 	gridLayout = args[0]
@@ -279,18 +286,21 @@ def createP1(*args):
 		gridlayout2.add_widget(txtInpt2)
 		mainBox.add_widget(gridlayout2)
 		
+		
+	if popupTitle == 'Arguments':
+		gridlayout = GridLayout(cols=2,id="gridlayoutID")
+		#label = 
+		
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
 	innerButtonControlBox.add_widget(btn_cancel)
 	mainBox.add_widget(innerButtonControlBox)
 
 	popup1 = Popup(title=popupTitle, content=mainBox, size_hint=(None,None), size=(550,500), auto_dismiss=False,id="Popup1ID")
-	if popup1.title =='Commands':
-		g = [gridlayout,txtInpt2]
-
 	btn_ok.bind(on_release=popup1.dismiss)
-	btn_cancel.bind(on_press=popup1.dismiss)
+	btn_cancel.bind(on_release=popup1.dismiss)
 	if popupTitle == 'Commands':
+		btn_cancel.bind(on_press=Par(enableAll,gridlayout))
 		return popup1, gridlayout,txtInpt2
 	else:
 		return popup1
