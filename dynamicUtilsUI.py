@@ -12,6 +12,7 @@ from kivy.properties import ObjectProperty, StringProperty
 from kivy.graphics import Color
 from kivy.graphics.instructions import Canvas
 import dataConnect as DBConn
+from kivy.uix.dropdown import DropDown
 from functools import partial as Par
 from kivy.uix.popup import Popup
 from screenClasses import *
@@ -187,6 +188,7 @@ def addValues(*args):
 	
 def displayArgumentDetails(*args):
 	print("Display pop-up for each argument details with control of modifying them")
+	btn=args[0]
 	
 def disableOthers(*args):
 	gridlayout = args[0]
@@ -234,7 +236,41 @@ def validateCommandImport(*args):
 		btn.text = "Click if it imports data from another command"
 		btn.font_size = 12
 		
-
+def addArgSection(*args):
+	grid = args[0]
+	
+def editSelection(*args):
+	print("In Edit Selection")
+	
+def selectArg(*args):
+	print("In Select Argument inside popup")
+	btn = args[0]
+	selection = args[1]
+	btn_edit = args[2]
+	btn_sub = args[3]
+	if btn.id not in selection:
+		selection.append(btn.id)
+	else:
+		selection.remove(btn.id)
+	print(selection)
+		
+	if len(selection) == 1:
+		btn_edit.disabled = False
+		btn_sub.disabled = False
+	elif len(selection) > 1:
+		btn_edit.disabled = True
+		btn_sub.disabled = False
+	else:
+		btn_edit.disabled = True
+		btn_sub.disabled = True
+		
+def deleteSelectedArguments(*args):
+	print("In procedure to delete selected arguments")
+	print(args[0])
+	
+def addArgument(*args):
+	print("In Procedure to add arguments")
+		
 def createP1(*args):
 	stat = args[0]
 	popupTitle = args[1]
@@ -254,14 +290,31 @@ def createP1(*args):
 		label2 = Label(text=str(err.msg),multiline=True,color=(1,0,0,1),id="label2ID")
 		mainBox.add_widget(label2)
 		
-	if popupTitle == 'Argument Details':
+	if popupTitle == 'Display Argument Details':
+		selection = []
 		gridlayout = GridLayout(cols=2,id="gridlayoutID")
+		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1))
+		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1))
+		btn_sub.disabled = True
+		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
+		box.add_widget(btn_add)
+		box.add_widget(btn_sub)
+		mainBox.add_widget(gridlayout)
+		mainBox.add_widget(box)
+		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
+		btn_edit.bind(on_press=Par(editSelection))
+		btn_add.bind(on_press=Par(addArgument))
+		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection))
+		btn_edit.disabled = True
+		innerButtonControlBox.add_widget(btn_edit)
 		for eachArg in args[3]:
 			string = "{arg}".format(arg=args[3][eachArg])
-			btn = Button(text=string,id=str("btn"+str(args[3][eachArg])+"ID"))
+			btn = myButton(text=string,id=str(eachArg))
 			gridlayout.add_widget(btn)
-			btn.bind(on_press=Par(displayArgumentDetails))
-		mainBox.add_widget(gridlayout)
+			btn.bind(on_press=Par(selectArg,btn,selection,btn_edit,btn_sub))
+		
+		
+		
 
 	if popupTitle == 'Add Argument':
 		dictOfCommands = args[3]
@@ -301,9 +354,23 @@ def createP1(*args):
 		
 		
 	if popupTitle == 'Arguments':
-		gridlayout = GridLayout(cols=2,id="gridlayoutID")
+		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(1,.5))
+		kindOfValues = ['NULL','ABP','NUMR','STR']
 		#label = 
-		
+		dropdown = DropDown()
+		for eachType in kindOfValues:
+			btn_tmp = Button(text=eachType, size_hint_y=None, height=44)
+			btn_tmp.bind(on_release=lambda btn_tmp: dropdown.select(btn_tmp.text))
+			dropdown.add_widget(btn_tmp)
+		btn_add = Button(text='+',font_size=12,background_color=(0,1,0,1))
+		btn_sub = Button(text='-',font_size=12,background_color=(0,1,0,1))
+		btn_sub.disabled = True
+		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
+		box.add_widget(btn_add)
+		box.add_widget(btn_sub)
+		mainBox.add_widget(gridlayout)
+		mainBox.add_widget(box)
+		btn_add.bind(on_release=dropdown.open)
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
 	innerButtonControlBox.add_widget(btn_cancel)
@@ -323,7 +390,7 @@ def createP1(*args):
 	
 class myButton(Button):
 	background_color_normal = list([.5,.2,.2,1])
-	background_color_down = list([1,0,.5,1])
+	background_color_down = list([0,1,0,1])
 
 	def __init__(self,**kwargs):
 		super(myButton,self).__init__(**kwargs)

@@ -129,7 +129,7 @@ class EditCommandScreen(Screen):
 			self.ids.diplayArgDetailButtonID.disabled = False
 		
 	def displayDetail(self):
-		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Argument Details","",conn.dictOfArguments,conn.dictOfArgVal)
+		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Display Argument Details","",conn.dictOfArguments,conn.dictOfArgVal)
 		pop.open()
 		
 	def addArgument(self):
