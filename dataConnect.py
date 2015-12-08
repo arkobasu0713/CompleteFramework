@@ -9,6 +9,8 @@ import os
 import time
 import platform
 from mysql.connector import errorcode
+from dynamicUtilsUI import * 
+
 
 def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 	generateSoftPackID = random.randint(0,9999)
@@ -41,21 +43,46 @@ def processArgEntry(*args):
 	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
 	if commandIDImportsFrom != "valButtonID":
 		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': int(commandIDImportsFrom), 'importsTag': txtInptImport,}
+		print(data)
+		argumentValuesQuery = ("INSERT INTO ARGUMENT_VALUES VALUES (%(argumentID)s,%(ARGUMENT_VAL_TYPE)s,%(DEFAULT_VALUE)s,%(DEFAULT_ARG_PARAMETER)s)")
+		fetchQuery = ("SELECT ARGUMENT_ID FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND COMMAND_ID = %s AND ARGUMENT = %s")
 	else:
 		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': None, 'importsTag': None,}
 	try:
+		flag1 = 0
+		flag2 = 0
 		if arg.text != None and arg.text != "":
 			print(data)
 			conn.cursor.execute(query,data)
 			conn.cnx.commit()
+			flag1 = 1
+			if commandIDImportsFrom != 'valButtonID':
+				conn.cursor.execute(fetchQuery,[softPackID,commandID,arg.text,])
+				data1 = conn.cursor.fetchall()
+				print(data1)
+				dataAct = data1[0][0]
+				print(dataAct)
+				argumentValuesData = {'argumentID':dataAct,'ARGUMENT_VAL_TYPE':'IMP','DEFAULT_VALUE':None,'DEFAULT_ARG_PARAMETER':None,}
+				print(argumentValuesData)
+				conn.cursor.execute(argumentValuesQuery,argumentValuesData)
+				conn.cnx.commit()
+				flag2 = 1
 		else:
 			print("No Update.")
 	except MConn.Error as e:
 		print("Error code: " + str(e.errno))
 		print("Error Message: " + str(e.msg))
 		print(str(e))
+		if flag1 != 1:
+			popupFailure = createP1('Failure','Database transaction of Arguments and Values',"Unsuccessful transaction on table ARGUMENTS",e)
+		elif flag2 != 2:
+			popupFailure = createP1('Failure','Database transaction of Arguments and Values',"Successful Transaction on ARGUMENTS but, Unsuccessful transaction on table ARGUMENT_VALUES",e)
+		popupFailure.open()
 	else:
+		popupSuccess = createP1('Success','Database transaction of Arguments and Values',"Transaction for arguments and corresponding values were successful")
+		popupSuccess.open()
 		print('Success')
+		
 	
 def deleteCommand(conn,commandIDs,softPackageID):
 	deleteCommand_query = ("DELETE FROM SOFTWARE_COMMANDS WHERE COMMAND_ID = %s AND SOFTWARE_PACKAGE_ID = %s")

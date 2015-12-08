@@ -18,11 +18,12 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.graphics import Color
 from kivy.graphics.instructions import Canvas
+from screenClasses import *
 import dataConnect as DBConn
 from functools import partial as Par
 from kivy.uix.popup import Popup
 import dynamicUtilsUI as UTIL
-from screenClasses import *
+
 
 Builder.load_file("appScript2.kv")
 class AutomatedFrameworkForSoftwareTesting(App):

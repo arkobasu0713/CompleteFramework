@@ -46,10 +46,10 @@ class CreateCommandScreen(Screen):
 			ret = DBConn.processNewEntryCommand(commandName,conn,self.hasMand,self.hasOpt)
 			print(ret)
 			if ret == 'Success':
-				popup = UTIL.createP1('Success','Create Command')
+				popup = UTIL.createP1('Success','Create Command','Successful transaction on table SOFTWARE_COMMANDS for creating Command')
 				popup.open()
 			else:
-				popup = UTIL.createP1('Failure','Create Command',ret)
+				popup = UTIL.createP1('Failure','Create Command','Unsuccessful transaction on table SOFTWARE_COMMANDS',ret)
 				popup.open()
 		else:
 			print("Enter command name")
@@ -79,10 +79,10 @@ class EditCommandScreen(Screen):
 	def delete(self,*args):
 		ret = DBConn.deleteCommand(conn,self.commandList,conn.softwarePackageID)
 		if ret == 'Success':
-			popup = UTIL.createP1('Success','Delete Command')
+			popup = UTIL.createP1('Success','Delete Command','Successful Deletion of Command')
 			popup.open()
 		else:
-			popup = UTIL.createP1('Failure','Delete Command',ret)
+			popup = UTIL.createP1('Failure','Delete Command','Unable to delete command',ret)
 			popup.open()
 
 		
@@ -125,14 +125,15 @@ class EditCommandScreen(Screen):
 		label_str = "{numberOfArguments} Arguments Found".format(numberOfArguments=len(conn.dictOfArguments))
 		label_tmp = Label(text=label_str,background_color=(1,1,0,1),multiline=True)
 		self.ids.boxToDisplayArgumentDetailsID.add_widget(label_tmp)
-		self.ids.diplayArgDetailButtonID.disabled = False
+		if len(conn.dictOfArguments) > 0:
+			self.ids.diplayArgDetailButtonID.disabled = False
 		
 	def displayDetail(self):
-		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Argument Details",conn.dictOfArguments,conn.dictOfArgVal)
+		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Argument Details","",conn.dictOfArguments,conn.dictOfArgVal)
 		pop.open()
 		
 	def addArgument(self):
-		pop = UTIL.createP1("Add argument values below","Add Argument",conn.dictOfCommands,self.commandList[0],conn)
+		pop = UTIL.createP1("Add argument values below","Add Argument","",conn.dictOfCommands,self.commandList[0],conn)
 		pop.open()
 		
 	def refreshContents(self):
