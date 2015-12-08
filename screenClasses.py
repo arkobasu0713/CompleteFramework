@@ -136,6 +136,7 @@ class EditCommandScreen(Screen):
 		pop.open()
 		
 	def refreshContents(self):
+		conn.reEstablishConnection()
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 		self.commandList = []
 		self.ids.deleteButtonID.disabled = True
@@ -264,6 +265,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		sm.current = 'EditCommandScreen'
 
 	def refreshContents(self):
+		conn.reEstablishConnection()
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 
 		self.ids.grid_id_commands_DPDS.clear_widgets()

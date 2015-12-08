@@ -23,8 +23,8 @@ import platform
 import subprocess
 import shutil
 
-global control
-control = 0
+global command
+command = 0
 def mappingNetworkDrive():
 	print("Current OS the script is running on: " + str(platform.system()))
 	if platform.system() == 'Windows':
@@ -171,10 +171,12 @@ def createPopupWidget2(sm,dictOfStatus,size):
 	return popup1
 	
 def displayCommands(*args):
+	dictOfCommands = args[0]
 	btn = args[1]
-	popupNew, grid, txtInpt2 = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
+	txtInptImport = args[2]
+	popupNew, grid = createP1("Select the Command from the below list that the argument imports data from","Commands",args[0])
 	popupNew.open()
-	par = Par(validateCommandImport,grid, txtInpt2, btn)
+	par = Par(validateCommandImport,grid, btn, txtInptImport,dictOfCommands)
 	popupNew.bind(on_dismiss=par)
 		
 		
@@ -185,11 +187,6 @@ def addValues(*args):
 	
 def displayArgumentDetails(*args):
 	print("Display pop-up for each argument details with control of modifying them")
-	
-def processArgEntry(*args):
-	print(args[0])
-	print(args[1])
-	DBConn.processArgEntry()
 	
 def disableOthers(*args):
 	gridlayout = args[0]
@@ -209,22 +206,31 @@ def enableAll(*args):
 def validateCommandImport(*args):
 	print("Validate import procedure")
 	gridLayout = args[0]
-	txtBox = args[1]
-	btn = args[2]
-	count = 0 
+	btn = args[1]
+	count = 0
 	child = None
+	dictOfCommands = args[3]
+	txtInptImport = args[2]
 	for children in gridLayout.children:
 		if children.disabled == False:
 			count = count + 1
 			child = children
 	if count == 1:
 		print(child)
-		print(child.text)
 		print("Commandid: " + child.id)
-		print(txtBox.text)
 		btn.background_color = list([1,0,.5,1])
+		btn.id = child.id
+		print(dictOfCommands[int(child.id)])
+		btn.text = "Imports data from Command ID: {} ({})".format(child.id,dictOfCommands[int(child.id)])
+		txtInptImport.disabled = False
 	else:
 		btn.background_color = list([1,1,1,1])
+		txtInptImport.text = ""
+		txtInptImport.disabled = True
+		btn.id = "valButtonID"
+		btn.text = "Click if it imports data from another command"
+		btn.font_size = 12
+		
 
 def createP1(*args):
 	stat = args[0]
@@ -254,6 +260,9 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 
 	if popupTitle == 'Add Argument':
+		dictOfCommands = args[2]
+		commandList = args[3]
+		dbConn = args[4]
 		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(1,.5))
 		label1 = Label(text="Argument Description: ",color=(1,0,0,1),id="label1ID")
 		gridlayout.add_widget(label1)
@@ -261,15 +270,20 @@ def createP1(*args):
 		gridlayout.add_widget(txtInpt)
 		btn = Button(text="Click if it imports data from another command",font_size=12,id="btnID")
 		gridlayout.add_widget(btn)
-		btn.bind(on_press=Par(displayCommands,args[2],btn))
 		btn_val = Button(text="Click to add Values to the argument",font_size=12,id='valButtonID')
 		gridlayout.add_widget(btn_val)
-		btn_val.bind(on_press=Par(addValues))
+		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
+		txtInptImport = TextInput(id="textInputForImportTagID")
+		txtInptImport.disabled = True
+		gridlayout.add_widget(labelImport)
+		gridlayout.add_widget(txtInptImport)
 		mainBox.add_widget(gridlayout)
 		btn_save = Button(text="Save to DB",background_color=(1,0,0,1),id="buttonSaveID")
 		innerButtonControlBox.add_widget(btn_save)
-		btn_save.bind(on_press=Par(DBConn.processArgEntry,txtInpt,args[3],args[4]))
-		
+		btn.bind(on_press=Par(displayCommands,dictOfCommands,btn,txtInptImport))
+		btn_val.bind(on_press=Par(addValues))
+		btn_save.bind(on_press=Par(DBConn.processArgEntry,txtInpt,commandList,dbConn,txtInptImport,btn))
+			
 		
 	if popupTitle == 'Commands':
 		gridlayout = GridLayout(cols=3,id="gridIDPopUP")
@@ -279,12 +293,6 @@ def createP1(*args):
 			gridlayout.add_widget(btn_tmp)
 			btn_tmp.bind(on_press=Par(disableOthers,gridlayout,idString))
 		mainBox.add_widget(gridlayout)
-		gridlayout2 = GridLayout(cols=2,size_hint=(1,.3),id="gridlayout2ID")
-		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
-		txtInpt2 = TextInput(id="textInputForImportTagID")
-		gridlayout2.add_widget(labelImport)
-		gridlayout2.add_widget(txtInpt2)
-		mainBox.add_widget(gridlayout2)
 		
 		
 	if popupTitle == 'Arguments':
@@ -301,7 +309,7 @@ def createP1(*args):
 	btn_cancel.bind(on_release=popup1.dismiss)
 	if popupTitle == 'Commands':
 		btn_cancel.bind(on_press=Par(enableAll,gridlayout))
-		return popup1, gridlayout,txtInpt2
+		return popup1, gridlayout
 	else:
 		return popup1
 	

@@ -31,11 +31,18 @@ def processArgEntry(*args):
 	commandID = int(args[1])
 	arg = args[0]
 	conn = args[2]
+	txtInptImport = args[3].text
+	commandIDImportsFrom = args[4].id
 	print(arg.text)
 	print(commandID)
+	print(txtInptImport)
+	print(commandIDImportsFrom)
 	softPackID = conn.softwarePackageID
 	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
-	data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': None, 'importsTag':None,}
+	if commandIDImportsFrom != "valButtonID":
+		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': int(commandIDImportsFrom), 'importsTag': txtInptImport,}
+	else:
+		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': None, 'importsTag': None,}
 	try:
 		if arg.text != None and arg.text != "":
 			print(data)
