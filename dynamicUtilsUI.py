@@ -183,7 +183,7 @@ def displayCommands(*args):
 
 def addValues(*args):
 	print("Display pop-up for adding argument values")
-	popup = createP1("Enter Argument values","Arguments","You can add multiple values under this screen")
+	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
 	popup = popup.open()
 	
 def displayArgumentDetails(*args):
@@ -264,12 +264,43 @@ def selectArg(*args):
 		btn_edit.disabled = True
 		btn_sub.disabled = True
 		
+def addDetails(*args):
+	print("In procedure to add details")
+	gridlayout = args[0]
+	label = Label(text="Argument Value Type: ",color=(1,0,0,1))
+	label2 = Label(text="Default Argument Parameter: ",color=(1,0,0,1))
+	label3 = Label(text="Default Value",color=(1,0,0,1))
+	textInput = TextInput(id="textInputIDForDefaultArgParameter")
+	textInput2 = TextInput(id="textInputIDForDefaultValue")
+	gridlayout.add_widget(label)
+	btnMain = Button(text="ValueType",id="valueTypeID")	
+	gridlayout.add_widget(btnMain)
+	gridlayout.add_widget(label2)
+	gridlayout.add_widget(textInput)
+	gridlayout.add_widget(label3)
+	gridlayout.add_widget(textInput2)
+	kindOfValues = ['NULL','ABP','NUMR','STR']
+	dropdown = DropDown()
+	for eachType in kindOfValues:
+		btn_tmp = Button(text=eachType, size_hint_y=None, height=20)
+		btn_tmp.bind(on_release=lambda btn_tmp: dropdown.select(btn_tmp.text))
+		dropdown.add_widget(btn_tmp)
+			
+	btnMain.bind(on_release=dropdown.open)
+	dropdown.bind(on_select=lambda instance, x: setattr(btnMain,'text',x))
+	
 def deleteSelectedArguments(*args):
 	print("In procedure to delete selected arguments")
-	print(args[0])
+	selection = args[0]
+	print(selection)
 	
 def addArgument(*args):
 	print("In Procedure to add arguments")
+	dictOfCommands = args[0]
+	selection = args[1]
+	dbConn = args[2]
+	popupAddArgument = createP1("Add argument Description below","Add Argument","",dictOfCommands,selection,dbConn)
+	popupAddArgument.open()
 		
 def createP1(*args):
 	stat = args[0]
@@ -292,6 +323,11 @@ def createP1(*args):
 		
 	if popupTitle == 'Display Argument Details':
 		selection = []
+		dictOfArguments = args[3]
+		dictOfCommands = args[4]
+		dbConn = args[5]
+		dictOfArgVal = args[6]
+		print(dictOfArgVal)
 		gridlayout = GridLayout(cols=2,id="gridlayoutID")
 		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1))
 		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1))
@@ -303,31 +339,28 @@ def createP1(*args):
 		mainBox.add_widget(box)
 		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
 		btn_edit.bind(on_press=Par(editSelection))
-		btn_add.bind(on_press=Par(addArgument))
+		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection))
 		btn_edit.disabled = True
 		innerButtonControlBox.add_widget(btn_edit)
-		for eachArg in args[3]:
+		for eachArg in dictOfArguments:
 			string = "{arg}".format(arg=args[3][eachArg])
 			btn = myButton(text=string,id=str(eachArg))
 			gridlayout.add_widget(btn)
 			btn.bind(on_press=Par(selectArg,btn,selection,btn_edit,btn_sub))
 		
-		
-		
-
 	if popupTitle == 'Add Argument':
 		dictOfCommands = args[3]
 		commandList = args[4]
 		dbConn = args[5]
-		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(1,.5))
+		gridlayout = GridLayout(cols=2,id="gridlayoutID")
 		label1 = Label(text="Argument Description: ",color=(1,0,0,1),id="label1ID")
 		gridlayout.add_widget(label1)
 		txtInpt = TextInput(id='textInputForArgumentID') #validation required for argument text
 		gridlayout.add_widget(txtInpt)
-		btn = Button(text="Click if it imports data from another command",font_size=12,id="btnID")
+		btn = Button(text="Click to import from another command",font_size=10,id="btnID",size_hint=(.75,1))
 		gridlayout.add_widget(btn)
-		btn_val = Button(text="Click to add Values to the argument",font_size=12,id='valButtonID')
+		btn_val = Button(text="Click to add values",font_size=10,id='valButtonID',size_hint=(.25,1))
 		gridlayout.add_widget(btn_val)
 		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
 		txtInptImport = TextInput(id="textInputForImportTagID")
@@ -353,24 +386,29 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 		
 		
-	if popupTitle == 'Arguments':
-		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(1,.5))
-		kindOfValues = ['NULL','ABP','NUMR','STR']
-		#label = 
-		dropdown = DropDown()
-		for eachType in kindOfValues:
-			btn_tmp = Button(text=eachType, size_hint_y=None, height=44)
-			btn_tmp.bind(on_release=lambda btn_tmp: dropdown.select(btn_tmp.text))
-			dropdown.add_widget(btn_tmp)
-		btn_add = Button(text='+',font_size=12,background_color=(0,1,0,1))
-		btn_sub = Button(text='-',font_size=12,background_color=(0,1,0,1))
+	if popupTitle == 'Add Values':
+		boxLayout  = BoxLayout(orientation='horizontal',size_hint=(1,.6))
+		boxLayoutSmall = BoxLayout(orientation='vertical',size_hint=(.3,1))
+		labelArg = Label(text="Argument Values:",font_size=8, color=(0,1,0,1))
+		boxLayoutSmall.add_widget(labelArg)
+		boxLayout.add_widget(boxLayoutSmall)
+		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.7,1))
+		boxLayout.add_widget(gridlayout)
+		btn_plus = Button(text='+',font_size=12,background_color=(0,1,0,1))
+		btn_minus = Button(text='-',font_size=12,background_color=(0,1,0,1))
+		boxSmall = BoxLayout(orientation='horizontal',size_hint=(.25,1))
+		boxSmall.add_widget(btn_plus)
+		boxSmall.add_widget(btn_minus)
+		btn_add = Button(text='Save Values',font_size=12,background_color=(0,1,0,1))
+		btn_sub = Button(text='Delete Values',font_size=12,background_color=(0,1,0,1))
 		btn_sub.disabled = True
 		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
+		box.add_widget(boxSmall)
 		box.add_widget(btn_add)
 		box.add_widget(btn_sub)
-		mainBox.add_widget(gridlayout)
+		mainBox.add_widget(boxLayout)
 		mainBox.add_widget(box)
-		btn_add.bind(on_release=dropdown.open)
+		btn_plus.bind(on_press=Par(addDetails,gridlayout))
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
 	innerButtonControlBox.add_widget(btn_cancel)
