@@ -192,7 +192,7 @@ if __name__ == "__main__":
 			logDest = ''
 			logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
 			if logDest == '':
-				logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d-%m-%s"))))
+				logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d"))))
 			createLogDest(logDest)
 			if len(run) == 1 and run[0] == 0:
 				for eachFile in dictOfFileNames:

@@ -241,6 +241,9 @@ def addArgSection(*args):
 	
 def editSelection(*args):
 	print("In Edit Selection")
+	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
+	popup = popup.open()
+	
 	
 def selectArg(*args):
 	print("In Select Argument inside popup")

@@ -149,11 +149,13 @@
 				color: (1,1,0,1)
 				on_press: root.goToEditScreen()
 			Button:
+				id: createTestSuitID
 				text: 'Create New Test Suit'
 				color: (1,1,0,1)
 				font_size: 15
 				on_press: root.manager.current = 'CreateNewTestSuitScreen'
 			Button: 
+				id: editTestSuitID
 				text: 'Edit Test Suits'
 				color: (1,1,0,1)
 				on_press: root.manager.current = 'EditTestSuitScreen'
@@ -295,11 +297,6 @@
 			background_color: (1,0,0,1)
 			size_hint: (1,.1)
 			on_press: root.saveCommand()
-		Button:
-			text: 'Add Argument'
-			background_color: (1,0,0,1)
-			size_hint: (1,.1)
-			on_press: root.addArgument()
 		GridLayout:
 			id: id_grid_layout_for_arguments_CCS
 			cols: 4

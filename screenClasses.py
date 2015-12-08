@@ -207,6 +207,9 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.runScript = 'N'
 		self.ids.label_id1_DPDS.text = 'Commands and Test Suits for software package: ' + conn.softwarePackage
 		self.comSelect = []
+		self.ids.createTestSuitID.disabled = True
+		self.ids.editTestSuitID.disabled = True
+		self.ids.button_id3_DPDS.disabled = True
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 
