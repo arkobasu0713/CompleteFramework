@@ -37,12 +37,7 @@ class AutomatedFrameworkForSoftwareTesting(App):
 		sm.add_widget(CreateNewTestSuitScreen(name='CreateNewTestSuitScreen'))
 		sm.add_widget(EditTestSuitScreen(name='EditTestSuitScreen'))
 		return sm
-
-	def mapDrive(self):
-		self.mapDriveAt = UTIL.mappingNetworkDrive()
-		if mapDriveAt != '':
-			print("It has been mapped at: " + mapDriveAt)
-	
+		
 if __name__ == '__main__':
 	app = AutomatedFrameworkForSoftwareTesting()
 	app.run()

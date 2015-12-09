@@ -83,17 +83,6 @@
 					background_color: (1,0,0,1)
 					on_press: root.createEntry()
 				Button:
-					text: 'Create root directory for software package under mapped drive'
-					font_size: 13
-					background_color: (1,0,0,1)
-					on_press: root.createRootDirectory()
-			BoxLayout:
-				orientation: 'horizontal'
-				Button:
-					text: 'Map Network Drive'
-					background_color: (1,0,0,1)
-					on_press: app.mapDrive()
-				Button:
 					text: 'Back'
 					background_color: (1,0,0,1)
 					on_press: root.manager.current = 'ApplicationConsole'
@@ -195,13 +184,13 @@
 				background_color: (1,0,0,1)
 				text: 'Map Network Drive'
 				on_press: 
-					if app.mapDriveAt == '': app.mapDrive()
+					if root.mapDriveAt == '': root.mapDrive()
 					else: print("Drive already mapped")
 						
 			Button:
 				id: button_id3_DPDS
 				background_color: (1,0,0,1)
-				text: 'Create Folder in mapped Network Drive'
+				text: 'Create a new Test Folder in mapped Network Drive'
 				on_press: root.createFolder()
 			
 		BoxLayout:

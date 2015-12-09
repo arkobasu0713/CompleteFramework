@@ -181,6 +181,15 @@ if __name__ == "__main__":
 			if testScriptFileName in dictOfFileNames[eachValue]:
 				dictOfSpecificFileNames[j] = dictOfFileNames[eachValue]
 				j=j+1
+				
+	if testScriptDirectory is not None:
+		i = 1
+		for root, dirs, f in os.walk(testScriptDirectory):
+			for files in f:
+				if files.endswith(".txt"):
+					dictOfFileNames[i] = os.path.join(root,files)
+					i = i + 1
+		
 
 	while True:
 		

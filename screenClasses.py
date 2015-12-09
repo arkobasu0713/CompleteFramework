@@ -210,6 +210,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.createTestSuitID.disabled = True
 		self.ids.editTestSuitID.disabled = True
 		self.ids.button_id3_DPDS.disabled = True
+		self.mapDriveAt = ''
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 
@@ -233,7 +234,13 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.comSelect.append(args[0])
 		self.buttonIDList.append(args[1])
 
-
+	def mapDrive(self):
+		self.mapDriveAt = UTIL.mappingNetworkDrive()
+		if self.mapDriveAt != '':
+			print("It has been mapped at: " + self.mapDriveAt)
+			self.ids.button_id3_DPDS.disabled = False
+		else:
+			print("Mapping Error")
 		
 	def runCommandSuits(self):
 		logFilePath = self.ids.id_logpath_DPDS.text
@@ -258,6 +265,16 @@ class DisplayPackagesDetailsScreen(Screen):
 
 	def createFolder(self):
 		print("Creating folder under mapped network drive with software package name")
+		print("Creating folder inside the mapped directory in the format software_package_name_TestSuit_yyyymmdd")
+		folderName = conn.softwarePackage + "TestSuit" + str(time.strftime("%Y-%m-%d"))
+		absolutePathofFolderName = os.path.join(self.mapDriveAt,folderName)
+		if not os.path.exists(absolutePathofFolderName):
+			os.makedirs(absolutePathofFolderName)
+			print("Folder created at : " + absolutePathofFolderName)
+		else:
+			print("Folder already exists")
+		
+		
 
 	
 	def callback(self):
