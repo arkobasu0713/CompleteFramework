@@ -132,13 +132,13 @@ def createOutputFile(fileName,outputLocation):
 	outputLogFileLoc = os.path.join(outputFileLocation, outputLogFileName)
 	file =open(outputLogFileLoc,'w')
 	return file
+	
 def createScript(commandName,outputLocation):
 
 	fileName = commandName + ".txt"
 	filePath = os.path.join(outputLocation,fileName)
-	file = open(filePath, 'w')
 	print("File " + filePath +" for command, " + commandName +" created")
-	return file, filePath
+	return filePath
 
 def createOutputLogDirectory(logFilePath):
 
@@ -259,7 +259,7 @@ class enterDBSpace():
 		self.dictOfFileNames = {}
 	
 		for eachCommandID1 in comSelect:
-			file1, filename = createScript(self.dictOfCommands[eachCommandID1],self.outputLocation)
+			filename = createScript(self.dictOfCommands[eachCommandID1],self.outputLocation)
 			self.dictOfFileNames[eachCommandID1] = filename
 
 #		print(self.dictOfFileNames)

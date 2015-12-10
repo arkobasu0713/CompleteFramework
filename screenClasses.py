@@ -211,6 +211,8 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.editTestSuitID.disabled = True
 		self.ids.button_id3_DPDS.disabled = True
 		self.mapDriveAt = ''
+		self.logFilePath = ''
+		self.folderName = ''
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 
@@ -246,6 +248,9 @@ class DisplayPackagesDetailsScreen(Screen):
 		logFilePath = self.ids.id_logpath_DPDS.text
 		if logFilePath == "":
 			logFilePath = UTIL.fetchLogFilePath()
+		if self.mapDriveAt != '':
+			logFilePath = self.folderName
+		print(logFilePath)
 		
 		
 		conn.fetchArgumentsForSelectCommands(self.comSelect)
@@ -264,6 +269,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		del self.buttonIDList[:]
 
 	def createFolder(self):
+		self.folderName = ''
 		print("Creating folder under mapped network drive with software package name")
 		print("Creating folder inside the mapped directory in the format software_package_name_TestSuit_yyyymmdd")
 		folderName = conn.softwarePackage + "TestSuit" + str(time.strftime("%Y-%m-%d"))
@@ -271,12 +277,11 @@ class DisplayPackagesDetailsScreen(Screen):
 		if not os.path.exists(absolutePathofFolderName):
 			os.makedirs(absolutePathofFolderName)
 			print("Folder created at : " + absolutePathofFolderName)
+			self.folderName = absolutePathofFolderName
 		else:
 			print("Folder already exists")
+			self.folderName = absolutePathofFolderName
 		
-		
-
-	
 	def callback(self):
 		sm.add_widget(DisplayResultsScreen(name='DisplayResultsScreen'))
 		sm.current = 'DisplayResultsScreen'
