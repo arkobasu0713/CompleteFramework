@@ -251,6 +251,9 @@ class enterDBSpace():
 					if eachValType in ['ABP','STR']:
 						listOfValues.append(defVal)
 					self.dictOfArgumentTypes[eachValType] = defVal
+					
+					
+				
 				self.dictOfArgVal[eachArg] = listOfValues
 				self.dictOfArgVal2[eachArg] = self.dictOfArgumentTypes
 

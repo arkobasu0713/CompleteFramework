@@ -29,7 +29,7 @@ def mappingNetworkDrive():
 	if platform.system() == 'Windows':
 		
 		#formatting the command string for mapping the network drive
-		commandString = "net use q: \\\\nserver.hgst.com\ISOs\iso2usb"
+		commandString = "net use q: \\\\nserver.hgst.com\softwaretoolstest"
 
 		username = input("Enter username(optional): ")
 		password = input("Enter password(optional): ")
@@ -54,7 +54,7 @@ def mappingNetworkDrive():
 	elif platform.system() == 'Linux':
 		
 		#formatting the command string for mapping the network drive
-		commandString = "mount -t cifs -w //nserver.hgst.com/ISOs/iso2usb"
+		commandString = "mount -t cifs -w //nserver.hgst.com/softwaretoolstest"
 		print("Creating mount location within directory structure.")
 		mountLocation = os.path.join(os.getcwd(),("mountLocation"+str(time.strftime("%Y-%m-%d"))))
 		print("Mount location being used: " + mountLocation)
@@ -68,7 +68,7 @@ def mappingNetworkDrive():
 					pass
 				else: raise
 		print("Mounting network drive with default values") #needs to be worked upon
-		commandString = commandString + " -o username=disty,password=sitlab"
+		commandString = commandString + " -o username=abasu,password=disco1234"
 		
 		print("Cmd String: " + commandString)
 		p = subprocess.Popen(commandString,shell=True,stdout = subprocess.PIPE,stderr = subprocess.PIPE)
