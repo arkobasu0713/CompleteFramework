@@ -235,27 +235,39 @@ class enterDBSpace():
 			for i in range(len(argID)):
 				self.dictOfArguments[argID[i]] = arg[i]
 
-			
-
-
 	def retreiveValuesForArguments(self):
 		self.dictOfArgVal = {}
 		self.dictOfArgVal2 = {}
 		for argSet in self.dictOfCommandArguments:
 			for eachArg in self.dictOfCommandArguments[argSet]:
-				self.dictOfArgumentTypes = {}
 				self.cursor.execute("select ARGUMENT_VAL_TYPE, DEFAULT_VALUE from ARGUMENT_VALUES WHERE ARGUMENT_ID = %s",(eachArg,))
 				data = self.cursor.fetchall()
 				listOfValues=[]
 				for eachValType, defVal in data:
 					if eachValType in ['ABP','STR']:
 						listOfValues.append(defVal)
-					self.dictOfArgumentTypes[eachValType] = defVal
+					if eachValType =='NSR':
+						val = int(defVal) + randint(1)
+						listOfValues.append(val)
+					if eachValType == 'NER':
+						val = int(defVal) - randint(1)
+						listOfValues.append(val)
+						
+					if eachValType == 'IMP':
+						self.cursor.execute("select IMPORTS_FROM_COMMAND_ID, IMPORT_TAG from ARGUMENTS WHERE ARGUMENT_ID = %s and SOFTWARE_PACKAGE_ID = %s and COMMAND_ID = %s",[eachArg, self.softwarePackageID,argSet,])
+						data1 = self.cursor.fetchall()
+						for importFrom, importTag in data1:
+							formatString = 'IMP{' + self.dictOfCommands[importFrom] + ',' + importTag+ '}'
+						listOfValues.append(formatString)
+					if eachValType == None:
+						listOfValues.append('')
 					
 					
-				
+			
+								
 				self.dictOfArgVal[eachArg] = listOfValues
 				self.dictOfArgVal2[eachArg] = self.dictOfArgumentTypes
+			print("-----------------------------------------------")
 
 	def createScripts(self,logFilePath,comSelect):
 		self.outputLocation = createOutputLogDirectory(logFilePath)

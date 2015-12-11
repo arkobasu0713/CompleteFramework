@@ -110,6 +110,7 @@ def runScript(scriptName,logDest):
 	success = 0
 	print("Running Script: " + scriptName)
 	for eachLine in readFile:
+		myFunct()
 		writeFile.write("=====================================================================\n")
 		writeFile.write("Running: " + eachLine)
 		writeFile.write('\n')
