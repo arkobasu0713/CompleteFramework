@@ -159,7 +159,6 @@ def runScript(scriptName,logDest):
 			for eachArgValSet in formatArgValues:
 #				print(eachArgValSet)
 				eachLine1 = commandLine.format(*eachArgValSet)
-				print(eachLine1)
 
 				writeFile.write("=====================================================================\n")
 				writeFile.write("Running: " + eachLine1)
