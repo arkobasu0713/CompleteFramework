@@ -246,12 +246,8 @@ class enterDBSpace():
 				for eachValType, defVal in data:
 					if eachValType in ['ABP','STR']:
 						listOfValues.append(defVal)
-					if eachValType =='NSR':
-						val = int(defVal) + randint(1)
-						listOfValues.append(val)
-					if eachValType == 'NER':
-						val = int(defVal) - randint(1)
-						listOfValues.append(val)
+					if eachValType == 'NSR' or eachValType == 'NER':
+						print("NER/NSR")
 						
 					if eachValType == 'IMP':
 						self.cursor.execute("select IMPORTS_FROM_COMMAND_ID, IMPORT_TAG from ARGUMENTS WHERE ARGUMENT_ID = %s and SOFTWARE_PACKAGE_ID = %s and COMMAND_ID = %s",[eachArg, self.softwarePackageID,argSet,])

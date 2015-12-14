@@ -11,6 +11,7 @@ import platform
 import subprocess
 import shutil
 import glob
+import re
 
 def RunScript(commandString):
 
@@ -101,6 +102,28 @@ def createOutputFile(fileName,logDest):
 	outputLogFileLoc = os.path.join(outputFileLocation, outputLogFileName)
 	file =open(outputLogFileLoc,'w')
 	return file
+	
+def runImport(softwarePackage,runCMD,lookForTag):
+	command = softwarePackage + " " + runCMD
+	p = RunScript(command)
+	output, err = p.communicate()
+	if output.decode('ascii') == '':
+		print(err.decode('ascii'))
+	else:
+		print(output.decode('ascii'))
+		for eachOutputLine in output.decode('ascii'):
+			if lookForTag.upper() in eachOutputLine:
+				print(eachOutputLine)
+				
+
+def checkForImport(commandLine):
+	softwarePackage = commandLine.split(' ')[0]
+	r = re.findall('{.*}',commandLine)
+	for eachParam in r:
+		runCMD = ((eachParam.strip('{}')).split(','))[0]
+		lookForTag = ((eachParam.strip('{}')).split(','))[1]
+		print(softwarePackage+" "+ runCMD +" " +lookForTag)
+		runImport(softwarePackage,runCMD,lookForTag)
 
 def runScript(scriptName,logDest):
 	writeFile = createOutputFile(scriptName,logDest)
@@ -110,7 +133,7 @@ def runScript(scriptName,logDest):
 	success = 0
 	print("Running Script: " + scriptName)
 	for eachLine in readFile:
-		myFunct()
+		checkForImport(eachLine)
 		writeFile.write("=====================================================================\n")
 		writeFile.write("Running: " + eachLine)
 		writeFile.write('\n')
@@ -195,38 +218,41 @@ if __name__ == "__main__":
 	while True:
 		
 		try:
-			print("The following script files were found in the remote network drive: ")
-			print(dictOfFileNames)
-			run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
-			run = [int(i) for i in run]
-			logDest = ''
-			logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
-			if logDest == '':
-				logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d"))))
-			createLogDest(logDest)
-			if len(run) == 1 and run[0] == 0:
-				for eachFile in dictOfFileNames:
-					runScript(dictOfFileNames[eachFile],logDest)
+			if len(dictOfFileNames) > 0:
+				print("The following script files were found in the remote network drive: ")
+				print(dictOfFileNames)
+				run = (input("Enter the numbers from the above list to run specific scripts separated with a semicolon(;) Or enter 0 (Zero) to execute all scripts: ")).split(';')
+				run = [int(i) for i in run]
+				logDest = ''
+				logDest = input(("Enter the location that you want to create the log files at. Hit enter and keep blank for the system to create a datetime stamped folder in the root directory of the setup script: ")).upper()
+				if logDest == '':
+					logDest = os.path.join(os.getcwd(),("LogDump"+str(time.strftime("%Y-%m-%d"))))
+				createLogDest(logDest)
+				if len(run) == 1 and run[0] == 0:
+					for eachFile in dictOfFileNames:
+						runScript(dictOfFileNames[eachFile],logDest)
+				else:
+					for serialScriptNum in run:
+						runScript(dictOfFileNames[serialScriptNum],logDest)
+				transfer = (input("Do you wish to copy the folder generated with logs to the remote directory?(y): ")).upper()
+				if transfer == 'Y':
+					for filename in os.listdir(logDest):
+						fullFileName = os.path.join(logDest,filename)
+						if (os.path.isfile(fullFileName)):
+							try:
+								shutil.copy(fullFileName,mapDriveAt)
+							except OSError as exc:
+								print(exc.strerror)
+							else:
+								print("Copy of " + fullFileName + " to remote drive " + mapDriveAt + " successful.")
+				
+				cont = (input("Do you wish to continue testing other scripts?(y): ")).upper()
+				if cont != 'Y':
+					break
 			else:
-				for serialScriptNum in run:
-					runScript(dictOfFileNames[serialScriptNum],logDest)
-			transfer = (input("Do you wish to copy the folder generated with logs to the remote directory?(y): ")).upper()
-			if transfer == 'Y':
-				for filename in os.listdir(logDest):
-					fullFileName = os.path.join(logDest,filename)
-					if (os.path.isfile(fullFileName)):
-						try:
-							shutil.copy(fullFileName,mapDriveAt)
-						except OSError as exc:
-							print(exc.strerror)
-						
-						else:
-							print("Copy of " + fullFileName + " to remote drive " + mapDriveAt + " successful.")
-			
-			cont = (input("Do you wish to continue testing other scripts?(y): ")).upper()
-			if cont != 'Y':
+				print("No Scripts found.")
 				break
-
+	
 		except OSError as exc:
 			print(exc.errno)
 

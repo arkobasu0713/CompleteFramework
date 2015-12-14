@@ -210,6 +210,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.createTestSuitID.disabled = True
 		self.ids.editTestSuitID.disabled = True
 		self.ids.button_id3_DPDS.disabled = True
+		self.ids.id_checkBox_DPDS.state = 'down'
 		self.mapDriveAt = ''
 		self.logFilePath = ''
 		self.folderName = ''
@@ -225,11 +226,10 @@ class DisplayPackagesDetailsScreen(Screen):
 		
 	
 	def setTrueAll(self,*args):
-		if self.ids.id_checkBox_DPDS.state == 'down':
+		if self.ids.id_checkBox_DPDS.state != 'down':
 			self.runScript = 'Y'
 		else:
 			self.runScript = 'N'
-
 		
 	def addSelection(self,*args):
 		print("Selection: " + str(args[0]))
