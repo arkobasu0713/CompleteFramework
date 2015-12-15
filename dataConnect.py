@@ -11,7 +11,46 @@ import platform
 from mysql.connector import errorcode
 from dynamicUtilsUI import * 
 
-
+def deleteArgDetails(listOfArgIDs,conn):
+	deleteValuesData = ("DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN (%s)")
+	listOfArg = [int(i) for i in listOfArgIDs]
+	tupOfArg = (tuple(listOfArg))
+	if len(tupOfArg) > 1:
+		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID IN " + str(tupOfArg)
+	elif len(tupOfArg) == 1 :
+		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
+	print(deleteArgData)
+	dataValue = ', '.join(list(map(lambda x: '%s',listOfArgIDs)))
+	deleteValuesData = deleteValuesData % dataValue
+	try:
+		flag1 = 0
+		flag2 = 0
+		conn.cursor.execute(deleteValuesData,listOfArgIDs)
+		flag1=1
+		conn.cnx.commit()
+		conn.cursor.execute(deleteArgData,[conn.softwarePackageID,])
+		flag2=1
+		conn.cnx.commit()
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		#return e
+		if flag1 != 1:
+			popupFailure = createP1('Failure','Deletion of Argument Values',"Unsuccessful transaction on table ARGUMENT_VALUES",e)
+		elif flag2 != 1:
+			popupFailure = createP1('Failure','Deletion of Arguments',"Successful Transaction on ARGUMENT_VALUES but, Unsuccessful transaction on table ARGUMENTS",e)
+		popupFailure.open()
+		return 0
+	else:
+		#return 'Success'
+		popupSuccess = createP1('Success','Deletion of Arguments and their Values',"Transaction for arguments and corresponding values were successful")
+		popupSuccess.open()
+		print('Success')
+		return 1
+	#print(deleteValuesData)
+	#print(deleteArgData)
+	
 def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 	generateSoftPackID = random.randint(0,9999)
 	currDate = time.strftime("%Y-%m-%d")
@@ -28,6 +67,7 @@ def processNewEntrySoftPackage(softPackageName,softwarePackageLocation,conn):
 		return e
 	else:
 		return 'Success'
+		
 def processArgEntry(*args):
 	print("Processing Argument Entry")
 	commandID = int(args[1])
@@ -35,15 +75,15 @@ def processArgEntry(*args):
 	conn = args[2]
 	txtInptImport = args[3].text
 	commandIDImportsFrom = args[4].id
-	print(arg.text)
-	print(commandID)
-	print(txtInptImport)
-	print(commandIDImportsFrom)
+	#print(arg.text)
+	#print(commandID)
+	#print(txtInptImport)
+	#print(commandIDImportsFrom)
 	softPackID = conn.softwarePackageID
 	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
 	if commandIDImportsFrom != "valButtonID":
 		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': int(commandIDImportsFrom), 'importsTag': txtInptImport,}
-		print(data)
+		#print(data)
 		argumentValuesQuery = ("INSERT INTO ARGUMENT_VALUES VALUES (%(argumentID)s,%(ARGUMENT_VAL_TYPE)s,%(DEFAULT_VALUE)s,%(DEFAULT_ARG_PARAMETER)s)")
 		fetchQuery = ("SELECT ARGUMENT_ID FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND COMMAND_ID = %s AND ARGUMENT = %s")
 	else:
@@ -52,18 +92,18 @@ def processArgEntry(*args):
 		flag1 = 0
 		flag2 = 0
 		if arg.text != None and arg.text != "":
-			print(data)
+			#print(data)
 			conn.cursor.execute(query,data)
 			conn.cnx.commit()
 			flag1 = 1
 			if commandIDImportsFrom != 'valButtonID':
 				conn.cursor.execute(fetchQuery,[softPackID,commandID,arg.text,])
 				data1 = conn.cursor.fetchall()
-				print(data1)
+				#print(data1)
 				dataAct = data1[0][0]
-				print(dataAct)
+				#print(dataAct)
 				argumentValuesData = {'argumentID':dataAct,'ARGUMENT_VAL_TYPE':'IMP','DEFAULT_VALUE':None,'DEFAULT_ARG_PARAMETER':None,}
-				print(argumentValuesData)
+				#print(argumentValuesData)
 				conn.cursor.execute(argumentValuesQuery,argumentValuesData)
 				conn.cnx.commit()
 				flag2 = 1
@@ -75,7 +115,7 @@ def processArgEntry(*args):
 		print(str(e))
 		if flag1 != 1:
 			popupFailure = createP1('Failure','Database transaction of Arguments and Values',"Unsuccessful transaction on table ARGUMENTS",e)
-		elif flag2 != 2:
+		elif flag2 != 1:
 			popupFailure = createP1('Failure','Database transaction of Arguments and Values',"Successful Transaction on ARGUMENTS but, Unsuccessful transaction on table ARGUMENT_VALUES",e)
 		popupFailure.open()
 	else:
@@ -258,9 +298,7 @@ class enterDBSpace():
 					if eachValType == None:
 						listOfValues.append('')
 					
-					
-			
-								
+							
 				self.dictOfArgVal[eachArg] = listOfValues
 				self.dictOfArgVal2[eachArg] = self.dictOfArgumentTypes
 			print("-----------------------------------------------")

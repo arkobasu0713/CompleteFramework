@@ -111,17 +111,15 @@ class EditCommandScreen(Screen):
 		self.ids.boxToDisplayArgumentDetailsID.clear_widgets()
 		conn.fetchArgumentsForSelectCommands(self.commandList)
 		conn.retreiveValuesForArguments()
-		print(conn.dictOfCommandArguments)
-		print('\n')
-		print(conn.dictOfArgVal)
-		print('\n')
-		print(conn.dictOfArguments)
-		print('\n')
-		print(conn.dictOfArgVal2)
-		print('\n')
-		print(conn.dictOfCommands)
-#		for eachArg in conn.dictOfArguments:
-#			idString = "label_id_"+str(eachArg)+"_Edit_Screen"
+		#print(conn.dictOfCommandArguments)
+		#print('\n')
+		#print(conn.dictOfArgVal)
+		#print('\n')
+		#print(conn.dictOfArguments)
+		#print('\n')
+		#print(conn.dictOfArgVal2)
+		#print('\n')
+		#print(conn.dictOfCommands)
 		label_str = "{numberOfArguments} Arguments Found".format(numberOfArguments=len(conn.dictOfArguments))
 		label_tmp = Label(text=label_str,background_color=(1,1,0,1),multiline=True)
 		self.ids.boxToDisplayArgumentDetailsID.add_widget(label_tmp)
@@ -129,7 +127,7 @@ class EditCommandScreen(Screen):
 			self.ids.diplayArgDetailButtonID.disabled = False
 		
 	def displayDetail(self):
-		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Display Argument Details","",conn.dictOfArguments,conn.dictOfCommands,conn,conn.dictOfArgVal)
+		pop = UTIL.createP1("Arguments. Click them to veiw/modify their values","Display Argument Details","",conn.dictOfArguments,conn.dictOfCommands,conn,conn.dictOfArgVal,self.commandList)
 		pop.open()
 		
 	def addArgument(self):
