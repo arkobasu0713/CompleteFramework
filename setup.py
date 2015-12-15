@@ -12,6 +12,7 @@ import subprocess
 import shutil
 import glob
 import re
+import itertools
 
 def RunScript(commandString):
 
@@ -108,22 +109,36 @@ def runImport(softwarePackage,runCMD,lookForTag):
 	p = RunScript(command)
 	output, err = p.communicate()
 	if output.decode('ascii') == '':
-		print(err.decode('ascii'))
+		return None, err
 	else:
-		print(output.decode('ascii'))
-		for eachOutputLine in output.decode('ascii'):
-			if lookForTag.upper() in eachOutputLine:
-				print(eachOutputLine)
+		listOfValues = []
+		for eachLine in (output.decode('ascii')).split(os.linesep):
+			if lookForTag.upper() in eachLine.upper():
+				value = (eachLine.replace('=','').replace(':','').split())[-1]
+				if value not in listOfValues:
+					listOfValues.append(value)
+#		print(listOfValues)
+		return listOfValues, output
 				
 
 def checkForImport(commandLine):
 	softwarePackage = commandLine.split(' ')[0]
-	r = re.findall('{.*}',commandLine)
+	r = re.findall(r'({.*?})',commandLine)
+	i=0
+	listOfArgValues = []
+
 	for eachParam in r:
 		runCMD = ((eachParam.strip('{}')).split(','))[0]
 		lookForTag = ((eachParam.strip('{}')).split(','))[1]
-		print(softwarePackage+" "+ runCMD +" " +lookForTag)
-		runImport(softwarePackage,runCMD,lookForTag)
+		listOfValues, outputOrErr = runImport(softwarePackage,runCMD,lookForTag)
+		replaceSTR = "IMP"+eachParam
+		arg = '{'+str(i)+'}'
+		listOfArgValues.append(listOfValues)
+		i = i + 1
+		commandLine = commandLine.replace(replaceSTR,arg)
+	return commandLine, listOfArgValues
+
+
 
 def runScript(scriptName,logDest):
 	writeFile = createOutputFile(scriptName,logDest)
@@ -133,32 +148,66 @@ def runScript(scriptName,logDest):
 	success = 0
 	print("Running Script: " + scriptName)
 	for eachLine in readFile:
-		checkForImport(eachLine)
-		writeFile.write("=====================================================================\n")
-		writeFile.write("Running: " + eachLine)
-		writeFile.write('\n')
-		p = RunScript(eachLine)
-		output, err = p.communicate()
-		if output.decode('ascii') == '':
-			writeFile.write(err.decode('ascii'))
-			fail = fail + 1
-		else:
-			writeFile.write(output.decode('ascii'))
-			success = success + 1
-		writeFile.write("\n")
-		numOfScripts = numOfScripts + 1
-		writeFile.write("---------------------------------------------------------------------\n")
-		if output.decode('ascii') == '':
-			writeFile.write("Command execution Status: FAILED\n")
-			writeFile.write("Class of ERROR code: " + str(p.returncode) + '\n')
-		else:
-			writeFile.write("Command execution Status: SUCCESS\n")
-		writeFile.write("=====================================================================\n")
-	print("\tRun Complete.")
-	print("\tTotal number of commands executed from the scripts: " + str(numOfScripts))
-	print("\tNumber of execution failures: " + str(fail))
-	print("\tNumber of execution success: " + str(success))
+		commandLine, listOfArgValues = checkForImport(eachLine)
+#		print(commandLine)
+#		print(listOfArgValues)
+		formatArgValues = None
+		if len(listOfArgValues) > 0:
+			formatArgValues = list(itertools.product(*listOfArgValues))
+#			print(formatArgValues)
+		if formatArgValues is not None:
+			for eachArgValSet in formatArgValues:
+#				print(eachArgValSet)
+				eachLine1 = commandLine.format(*eachArgValSet)
 
+				writeFile.write("=====================================================================\n")
+				writeFile.write("Running: " + eachLine1)
+				writeFile.write('\n')
+				p1 = RunScript(eachLine1)
+				output1, err1 = p1.communicate()
+				if output1.decode('ascii') == '':
+					writeFile.write(err1.decode('ascii'))
+					fail = fail + 1
+				else:
+					writeFile.write(output1.decode('ascii'))
+					success = success + 1
+				writeFile.write("\n")
+				numOfScripts = numOfScripts + 1
+				writeFile.write("---------------------------------------------------------------------\n")
+				if output1.decode('ascii') == '':
+					writeFile.write("Command execution Status: FAILED\n")
+					writeFile.write("Class of ERROR code: " + str(p1.returncode) + '\n')
+				else:
+					writeFile.write("Command execution Status: SUCCESS\n")
+				writeFile.write("=====================================================================\n")
+
+		else:		
+
+			writeFile.write("=====================================================================\n")
+			writeFile.write("Running: " + eachLine)
+			writeFile.write('\n')
+			p = RunScript(eachLine)
+			output, err = p.communicate()
+			if output.decode('ascii') == '':
+				writeFile.write(err.decode('ascii'))
+				fail = fail + 1
+			else:
+				writeFile.write(output.decode('ascii'))
+				success = success + 1
+			writeFile.write("\n")
+			numOfScripts = numOfScripts + 1
+			writeFile.write("---------------------------------------------------------------------\n")
+			if output.decode('ascii') == '':
+				writeFile.write("Command execution Status: FAILED\n")
+				writeFile.write("Class of ERROR code: " + str(p.returncode) + '\n')
+			else:
+				writeFile.write("Command execution Status: SUCCESS\n")
+			writeFile.write("=====================================================================\n")
+		print("\tRun Complete.")
+		print("\tTotal number of commands executed from the scripts: " + str(numOfScripts))
+		print("\tNumber of execution failures: " + str(fail))
+		print("\tNumber of execution success: " + str(success))
+	
 
 def createLogDest(logDest):
 	
