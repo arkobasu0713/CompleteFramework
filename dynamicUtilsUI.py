@@ -45,7 +45,10 @@ def mappingNetworkDrive():
 		if output.decode('ascii') == '':
 			print("Mapping network drive was unsuccessful")
 			print(err.decode('ascii'))
-			return ''
+			if 'SYSTEM ERROR 85' in(err.decode('ascii')).upper():
+				return 'q:'
+			else:
+				return ''
 		else:
 			print("Mapping network drive was successful")
 			return "q:"
