@@ -77,15 +77,20 @@ class EditCommandScreen(Screen):
 		self.ids.deleteButtonID.disabled = False
 
 	def delete(self,*args):
-		ret = DBConn.deleteCommand(conn,self.commandList,conn.softwarePackageID)
-		if ret == 'Success':
-			popup = UTIL.createP1('Success','Delete Command','Successful Deletion of Command')
+		conn.fetchArgumentsForSelectCommands(self.commandList)
+		conn.retreiveValuesForArguments()
+		ret, flag1, flag2, flag3, e = DBConn.deleteCommand(conn,self.commandList,conn.softwarePackageID)
+		if ret == 1:
+			popup = UTIL.createP1('Success','Successful deletion',"Transaction for specified commands on ARGUMENTS, ARGUMENT_VALUES, and SOFTWARE_COMMANDS successful")
 			popup.open()
 		else:
-			popup = UTIL.createP1('Failure','Delete Command','Unable to delete command',ret)
-			popup.open()
-
-		
+			if flag1 != 1:
+				popupFailure = UTIL.createP1('Failure','Unsuccessful Argument Value Deletion',"Unsuccessful transaction on table ARGUMENT_VALUES",e)
+			elif flag2 != 1:
+				popupFailure = UTIL.createP1('Failure','Unsuccessful Argument Deletion',"Successful Transaction on ARGUMENT_VALUES but, Unsuccessful transaction on table ARGUMENTS",e)
+			elif flag3 != 1:
+				popupFailure = UTIL.createP1('Failure','Unsuccessful Command Deletion',"Successful Transaction on ARGUMENTS and ARGUMENT_VALUES but, Unsuccessful transaction on table SOFTWARE_COMMANDS",e)
+			popupFailure.open()
 
 	def selectCommand(self,*args):
 		if args[0] not in self.commandList:
@@ -106,6 +111,7 @@ class EditCommandScreen(Screen):
 			self.ids.displayArgumentID.disabled = True
 			self.ids.addArgumentButtonID.disabled = True
 			self.ids.diplayArgDetailButtonID.disabled = True
+			self.ids.boxToDisplayArgumentDetailsID.clear_widgets()
 			
 	def query(self,*args):
 		self.ids.boxToDisplayArgumentDetailsID.clear_widgets()

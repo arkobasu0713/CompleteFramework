@@ -20,8 +20,7 @@ def deleteArgDetails(listOfArgIDs,conn):
 	elif len(tupOfArg) == 1 :
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
 	print(deleteArgData)
-	dataValue = ', '.join(list(map(lambda x: '%s',listOfArgIDs)))
-	deleteValuesData = deleteValuesData % dataValue
+	print(listOfArgIDs)
 	try:
 		flag1 = 0
 		flag2 = 0
@@ -75,10 +74,6 @@ def processArgEntry(*args):
 	conn = args[2]
 	txtInptImport = args[3].text
 	commandIDImportsFrom = args[4].id
-	#print(arg.text)
-	#print(commandID)
-	#print(txtInptImport)
-	#print(commandIDImportsFrom)
 	softPackID = conn.softwarePackageID
 	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
 	if commandIDImportsFrom != "valButtonID":
@@ -126,20 +121,47 @@ def processArgEntry(*args):
 	
 def deleteCommand(conn,commandIDs,softPackageID):
 	deleteCommand_query = ("DELETE FROM SOFTWARE_COMMANDS WHERE COMMAND_ID = %s AND SOFTWARE_PACKAGE_ID = %s")
-	executeData = []
-	print(commandIDs)
-	print(softPackageID)
+	argumentIDs = []
+	
+	for eachCommandID in commandIDs:
+		for eachArgID in conn.dictOfCommandArguments[eachCommandID]:
+			argumentIDs.append(eachArgID)
+	
+	tupOfArg = tuple(argumentIDs)
+	print(tupOfArg)
+	
+	listOfArg = [int(i) for i in argumentIDs]
+	tupOfArg = (tuple(listOfArg))
+	if len(tupOfArg) > 1:
+		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID IN " + str(tupOfArg)
+		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN" + str(tupOfArg)
+	elif len(tupOfArg) == 1 :
+		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
+		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN" + str(tupOfArg[0])
+	print(deleteArgData)
+	print(deleteValuesData)
+	#print(commandIDs)
+	#print(softPackageID)
 	try:
+		flag1 =0
+		flag2 =0
+		flag3 =0
+		conn.cursor.execute(deleteValuesData)
+		flag1=1
+		conn.cnx.commit()
+		conn.cursor.execute(deleteArgData,[conn.softwarePackageID,])
+		flag2=1
+		conn.cnx.commit()
 		for eachCommandID in commandIDs:
 			conn.cursor.execute(deleteCommand_query,[eachCommandID,softPackageID,])
-			conn.cnx.commit()
+		flag3=1
+		conn.cnx.commit()
 	except MConn.Error as e:
-		print("Error code: " + str(e.errno))
 		print("Error Message: " + str(e.msg))
 		print(str(e))
-		return e
+		return 0, flag1, flag2, flag3, e
 	else:
-		return 'Success'
+		return 1, flag1, flag2, flag3, ''
 
 def processNewEntryCommand(commandName,conn,hasMand,hasOpt):
 	addCommandQuery = ("INSERT INTO SOFTWARE_COMMANDS VALUES (%(softPackID)s,%(commandID)s,%(commandName)s,%(hasMand)s,%(hasOpt)s)")
@@ -242,9 +264,7 @@ class enterDBSpace():
 		
 
 	def fetchSoftPackage(self):
-		print("inconnect")
 		self.dictOfPackages.clear()
-		print(self.dictOfPackages)
 		self.cursor.execute("SELECT SOFTWARE_PACKAGE_ID,SOFTWARE_PACKAGE_NAME FROM SOFTWARE_PACKAGE_LOAD")
 		data = self.cursor.fetchall()
 		for package_id, package in data:
