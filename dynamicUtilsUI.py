@@ -182,11 +182,6 @@ def displayCommands(*args):
 	popupNew.bind(on_dismiss=par)
 		
 
-def addValues(*args):
-	print("Display pop-up for adding argument values")
-	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
-	popup = popup.open()
-	
 def disableOthers(*args):
 	gridlayout = args[0]
 	idString = args[1]
@@ -232,6 +227,7 @@ def validateCommandImport(*args):
 
 def editSelection(*args):
 	print("In Edit Selection")
+	print(args[0])
 	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
 	popup = popup.open()
 	
@@ -261,9 +257,9 @@ def selectArg(*args):
 def addDetails(*args):
 	print("In procedure to add details")
 	gridlayout = args[0]
-	label = Label(text="Argument Value Type: ",color=(1,0,0,1))
-	label2 = Label(text="Default Argument Parameter: ",color=(1,0,0,1))
-	label3 = Label(text="Default Value",color=(1,0,0,1))
+	label = Label(text="Argument Value Type: ",color=(1,0,0,1),font_size=10)
+	label2 = Label(text="Default Argument Parameter: ",color=(1,0,0,1),font_size=10)
+	label3 = Label(text="Default Value",color=(1,0,0,1),font_size=10)
 	textInput = TextInput(id="textInputIDForDefaultArgParameter")
 	textInput2 = TextInput(id="textInputIDForDefaultValue")
 	gridlayout.add_widget(label)
@@ -435,11 +431,11 @@ def createP1(*args):
 		
 	if popupTitle == 'Add Values':
 		boxLayout  = BoxLayout(orientation='horizontal',size_hint=(1,.6))
-		boxLayoutSmall = BoxLayout(orientation='vertical',size_hint=(.3,1))
+		boxLayoutSmall = BoxLayout(orientation='vertical',size_hint=(.5,1))
 		labelArg = Label(text="Argument Values:",font_size=8, color=(0,1,0,1))
 		boxLayoutSmall.add_widget(labelArg)
 		boxLayout.add_widget(boxLayoutSmall)
-		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.7,1))
+		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.5,1))
 		boxLayout.add_widget(gridlayout)
 		btn_plus = Button(text='+',font_size=12,background_color=(0,1,0,1))
 		boxSmall = BoxLayout(orientation='horizontal',size_hint=(.25,1))
