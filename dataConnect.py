@@ -137,7 +137,7 @@ def deleteCommand(conn,commandIDs,softPackageID):
 		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN" + str(tupOfArg)
 	elif len(tupOfArg) == 1 :
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
-		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN" + str(tupOfArg[0])
+		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID = " +str(tupOfArg[0])
 	print(deleteArgData)
 	print(deleteValuesData)
 	#print(commandIDs)
