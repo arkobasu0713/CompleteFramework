@@ -85,7 +85,7 @@ def mappingNetworkDrive():
 			return ''
 
 	else:
-		print("The script is being tried to run on a platform outside the scope of the covergae of this tool. Please note that mapping the network drive would not be possible")
+		print("The script is being tried to run on a platform outside the scope of the coverage of this tool. Please note that mapping the network drive would not be possible")
 		return ''
 	
 
@@ -176,22 +176,16 @@ def displayCommands(*args):
 	dictOfCommands = args[0]
 	btn = args[1]
 	txtInptImport = args[2]
-	btn_val = args[3]
 	popupNew, grid = createP1("Command Import","Commands","Select the Command from the below list that the argument imports data from",dictOfCommands)
 	popupNew.open()
-	par = Par(validateCommandImport,grid, btn, txtInptImport,dictOfCommands,btn_val)
+	par = Par(validateCommandImport,grid, btn, txtInptImport,dictOfCommands)
 	popupNew.bind(on_dismiss=par)
-		
 		
 
 def addValues(*args):
 	print("Display pop-up for adding argument values")
 	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
 	popup = popup.open()
-	
-def displayArgumentDetails(*args):
-	print("Display pop-up for each argument details with control of modifying them")
-	btn=args[0]
 	
 def disableOthers(*args):
 	gridlayout = args[0]
@@ -212,7 +206,6 @@ def validateCommandImport(*args):
 	print("Validate import procedure")
 	gridLayout = args[0]
 	btn = args[1]
-	btn_val = args[4]
 	count = 0
 	child = None
 	dictOfCommands = args[3]
@@ -229,19 +222,14 @@ def validateCommandImport(*args):
 		print(dictOfCommands[int(child.id)])
 		btn.text = "Imports data from Command ID: {} ({})".format(child.id,dictOfCommands[int(child.id)])
 		txtInptImport.disabled = False
-		btn_val.disabled = True
 	else:
 		btn.background_color = list([1,1,1,1])
 		txtInptImport.text = ""
 		txtInptImport.disabled = True
-		btn_val.disabled = False
 		btn.id = "valButtonID"
 		btn.text = "Click if it imports data from another command"
 		btn.font_size = 12
-		
-def addArgSection(*args):
-	grid = args[0]
-	
+
 def editSelection(*args):
 	print("In Edit Selection")
 	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
@@ -397,7 +385,7 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 		mainBox.add_widget(box)
 		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
-		btn_edit.bind(on_press=Par(editSelection))
+		btn_edit.bind(on_press=Par(editSelection,selection))
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
 		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub))
@@ -420,8 +408,8 @@ def createP1(*args):
 		gridlayout.add_widget(txtInpt)
 		btn = Button(text="Click to import from another command",font_size=10,id="btnID",size_hint=(.75,1))
 		gridlayout.add_widget(btn)
-		btn_val = Button(text="Click to add values",font_size=10,id='valButtonID',size_hint=(.25,1))
-		gridlayout.add_widget(btn_val)
+		la = Label(text="",color=(1,0,0,1),id="laID")
+		gridlayout.add_widget(la)
 		labelImport = Label(text="Import Tag: ",color=(1,0,0,1),id="labelImportID")
 		txtInptImport = TextInput(id="textInputForImportTagID")
 		txtInptImport.disabled = True
@@ -430,8 +418,7 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 		btn_save = Button(text="Save to DB",background_color=(1,0,0,1),id="buttonSaveID")
 		innerButtonControlBox.add_widget(btn_save)
-		btn.bind(on_press=Par(displayCommands,dictOfCommands,btn,txtInptImport,btn_val))
-		btn_val.bind(on_press=Par(addValues))
+		btn.bind(on_press=Par(displayCommands,dictOfCommands,btn,txtInptImport))
 		btn_save.bind(on_press=Par(DBConn.processArgEntry,txtInpt,commandList,dbConn,txtInptImport,btn))
 			
 		
@@ -455,10 +442,8 @@ def createP1(*args):
 		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.7,1))
 		boxLayout.add_widget(gridlayout)
 		btn_plus = Button(text='+',font_size=12,background_color=(0,1,0,1))
-		btn_minus = Button(text='-',font_size=12,background_color=(0,1,0,1))
 		boxSmall = BoxLayout(orientation='horizontal',size_hint=(.25,1))
 		boxSmall.add_widget(btn_plus)
-		boxSmall.add_widget(btn_minus)
 		btn_add = Button(text='Save Values',font_size=12,background_color=(0,1,0,1))
 		btn_sub = Button(text='Delete Values',font_size=12,background_color=(0,1,0,1))
 		btn_sub.disabled = True
