@@ -227,8 +227,9 @@ def validateCommandImport(*args):
 
 def editSelection(*args):
 	print("In Edit Selection")
-	print(args[0])
-	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen")
+	selection = [int(x) for x in args[0]]
+	conn = args[1]
+	popup = createP1("Enter Argument values","Add Values","You can add multiple values under this screen",selection,conn)
 	popup = popup.open()
 	
 	
@@ -257,6 +258,8 @@ def selectArg(*args):
 def addDetails(*args):
 	print("In procedure to add details")
 	gridlayout = args[0]
+	btn_add = args[1]
+	btn_add.disabled = False
 	label = Label(text="Argument Value Type: ",color=(1,0,0,1),font_size=10)
 	label2 = Label(text="Default Argument Parameter: ",color=(1,0,0,1),font_size=10)
 	label3 = Label(text="Default Value",color=(1,0,0,1),font_size=10)
@@ -340,6 +343,9 @@ def refreshContents(*args):
 		btn_edit.disabled = True
 		btn_sub.disabled = True
 		
+def selectArgVal(*args):
+	print("In procedure to select arg values")
+		
 	
 def createP1(*args):
 	stat = args[0]
@@ -381,7 +387,7 @@ def createP1(*args):
 		mainBox.add_widget(gridlayout)
 		mainBox.add_widget(box)
 		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
-		btn_edit.bind(on_press=Par(editSelection,selection))
+		btn_edit.bind(on_press=Par(editSelection,selection,dbConn))
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
 		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub))
@@ -430,10 +436,26 @@ def createP1(*args):
 		
 		
 	if popupTitle == 'Add Values':
+		selection = args[3][0]
+		dbConn = args[4]
+		print(selection)
 		boxLayout  = BoxLayout(orientation='horizontal',size_hint=(1,.6))
 		boxLayoutSmall = BoxLayout(orientation='vertical',size_hint=(.5,1))
-		labelArg = Label(text="Argument Values:",font_size=8, color=(0,1,0,1))
+		labelArg = Label(text="Argument Values:",font_size=10, color=(0,1,0,1))
 		boxLayoutSmall.add_widget(labelArg)
+		for eachValue in dbConn.dictOfArgVal2[selection]:
+			valueType = eachValue[0]
+			defaultValue = eachValue[1]
+			formatString = 'Value Type : ' + valueType + '\n' 
+			if valueType == 'IMP':
+				formatString = formatString + 'Imports data from: \n' + str(dbConn.dictOfArgVal[selection][0])
+				#print(dbConn.dictOfArgVal[selection])
+			else:
+				formatString = formatString + 'Default Value: ' + defaultValue			
+			btn_temp = myButton(text=formatString,font_size=8,color=(1,0,.5,.8))
+			boxLayoutSmall.add_widget(btn_temp)
+			btn_temp.bind(on_press=Par(selectArgVal))
+			
 		boxLayout.add_widget(boxLayoutSmall)
 		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.5,1))
 		boxLayout.add_widget(gridlayout)
@@ -443,13 +465,14 @@ def createP1(*args):
 		btn_add = Button(text='Save Values',font_size=12,background_color=(0,1,0,1))
 		btn_sub = Button(text='Delete Values',font_size=12,background_color=(0,1,0,1))
 		btn_sub.disabled = True
+		btn_add.disabled = True
 		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
 		box.add_widget(boxSmall)
 		box.add_widget(btn_add)
 		box.add_widget(btn_sub)
 		mainBox.add_widget(boxLayout)
 		mainBox.add_widget(box)
-		btn_plus.bind(on_press=Par(addDetails,gridlayout))
+		btn_plus.bind(on_press=Par(addDetails,gridlayout,btn_add))
 	
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
