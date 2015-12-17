@@ -11,20 +11,57 @@ import platform
 from mysql.connector import errorcode
 from dynamicUtilsUI import * 
 
+
+def saveArgumentValue(*args):
+	print("In procedure to save argument value")
+	selectionArgumentID = args[1][0]
+	conn = args[2]
+	boxForValueDisplay = args[3]
+	argValueType, argumentDefaultParameter, argumentDefaultValue= extractData(args[0])
+	print("Value Type: " + argValueType)
+	if argumentDefaultParameter == '':
+		argumentDefaultParameter = ''
+	print("Default parameter: " + str(argumentDefaultParameter))
+	print("Default value: " + argumentDefaultValue)
+	query = "INSERT INTO ARGUMENT_VALUES VALUES({0},'{1}','{2}','{3}')".format(selectionArgumentID,argValueType,argumentDefaultValue,argumentDefaultParameter)
+	print(query)
+	try:
+		conn.cursor.execute(query)
+		conn.cnx.commit()
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		popupFailure = createP1('Failure','Database transaction of saving Argument Values',"Unsuccessful transaction on table ARGUMENT_VALUES",e)
+		popupFailure.open()
+	else:
+		popupSuccess = createP1('Success','Database transaction of saving Argument Values',"Successful transaction on table ARGUMENT_VALUES")
+		popupSuccess.open()
+		del args[1][:]
+		#boxForValueDisplay.add_widget()
+		print('Success')
+		
+	
+def deleteArgumentValues(*args):
+	print("In procedure to delete argument values")
+
 def deleteArgDetails(listOfArgIDs,conn):
-	deleteValuesData = ("DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN (%s)")
 	listOfArg = [int(i) for i in listOfArgIDs]
 	tupOfArg = (tuple(listOfArg))
+	print(listOfArg)
+	print(tupOfArg)
 	if len(tupOfArg) > 1:
+		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN {0}".format(str(tupOfArg))
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID IN " + str(tupOfArg)
 	elif len(tupOfArg) == 1 :
+		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID = {0}".format(str(tupOfArg[0]))
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
+	print(deleteValuesData)
 	print(deleteArgData)
-	print(listOfArgIDs)
 	try:
 		flag1 = 0
 		flag2 = 0
-		conn.cursor.execute(deleteValuesData,listOfArgIDs)
+		conn.cursor.execute(deleteValuesData)
 		flag1=1
 		conn.cnx.commit()
 		conn.cursor.execute(deleteArgData,[conn.softwarePackageID,])
@@ -75,8 +112,9 @@ def processArgEntry(*args):
 	txtInptImport = args[3].text
 	commandIDImportsFrom = args[4].id
 	softPackID = conn.softwarePackageID
+	print(commandIDImportsFrom)
 	query = ("INSERT INTO ARGUMENTS VALUES (%(softPackID)s,%(commandID)s,%(argument)s,%(argumentID)s,%(ImportFrom)s,%(importsTag)s)")
-	if commandIDImportsFrom != "valButtonID":
+	if commandIDImportsFrom != "btnID":
 		data = {'softPackID':softPackID, 'commandID': commandID, 'argument':arg.text, 'argumentID': None, 'ImportFrom': int(commandIDImportsFrom), 'importsTag': txtInptImport,}
 		#print(data)
 		argumentValuesQuery = ("INSERT INTO ARGUMENT_VALUES VALUES (%(argumentID)s,%(ARGUMENT_VAL_TYPE)s,%(DEFAULT_VALUE)s,%(DEFAULT_ARG_PARAMETER)s)")
@@ -91,7 +129,7 @@ def processArgEntry(*args):
 			conn.cursor.execute(query,data)
 			conn.cnx.commit()
 			flag1 = 1
-			if commandIDImportsFrom != 'valButtonID':
+			if commandIDImportsFrom != 'btnID':
 				conn.cursor.execute(fetchQuery,[softPackID,commandID,arg.text,])
 				data1 = conn.cursor.fetchall()
 				#print(data1)

@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 from kivy.app import App
@@ -111,7 +112,14 @@ def end(self,*args):
 
 def changeScreen(self,*args):
 	args[0].current = 'WelcomeScreen'
-
+	
+def extractData(gridLayout):
+	
+	for child in gridLayout.children:
+		print(child)
+	return gridLayout.children[4].text, gridLayout.children[2].text, gridLayout.children[0].text
+	
+	
 def createPopupExit(sm):
 	box = BoxLayout()
 	btn1 = Button(text='Yes')
@@ -221,7 +229,7 @@ def validateCommandImport(*args):
 		btn.background_color = list([1,1,1,1])
 		txtInptImport.text = ""
 		txtInptImport.disabled = True
-		btn.id = "valButtonID"
+		btn.id = "btnID"
 		btn.text = "Click if it imports data from another command"
 		btn.font_size = 12
 
@@ -259,7 +267,6 @@ def addDetails(*args):
 	print("In procedure to add details")
 	gridlayout = args[0]
 	btn_add = args[1]
-	btn_add.disabled = False
 	label = Label(text="Argument Value Type: ",color=(1,0,0,1),font_size=10)
 	label2 = Label(text="Default Argument Parameter: ",color=(1,0,0,1),font_size=10)
 	label3 = Label(text="Default Value",color=(1,0,0,1),font_size=10)
@@ -272,7 +279,7 @@ def addDetails(*args):
 	gridlayout.add_widget(textInput)
 	gridlayout.add_widget(label3)
 	gridlayout.add_widget(textInput2)
-	kindOfValues = ['NULL','ABP','NUMR','STR']
+	kindOfValues = ['ABP','NSR','NER','STR']
 	dropdown = DropDown()
 	for eachType in kindOfValues:
 		btn_tmp = Button(text=eachType, size_hint_y=None, height=20)
@@ -281,6 +288,8 @@ def addDetails(*args):
 			
 	btnMain.bind(on_release=dropdown.open)
 	dropdown.bind(on_select=lambda instance, x: setattr(btnMain,'text',x))
+	
+	btn_add.disabled = False
 	
 def deleteSelectedArguments(*args):
 	print("In procedure to delete selected arguments")
@@ -319,32 +328,35 @@ def addArgument(*args):
 	popupAddArgument.open()
 
 def refreshContents(*args):
+	print('In Refresh contents')
 	grid = args[0]
 	grid.clear_widgets()
 	conn = args[1]
 	commandList = [args[2]]
 	selection = args[3]
+	print(selection)
 	btn_edit = args[4]
 	btn_sub = args[5]
 	conn.fetchArgumentsForSelectCommands(commandList)
+	conn.retreiveValuesForArguments()
 	for eachArg in conn.dictOfArguments:
 		string = "{arg}".format(arg=conn.dictOfArguments[eachArg])
 		btn = myButton(text=string,id=str(eachArg))
 		grid.add_widget(btn)
 		btn.bind(on_press=Par(selectArg,btn,selection,btn_edit,btn_sub))
 		
-	if len(selection) == 1:
-		btn_edit.disabled = False
-		btn_sub.disabled = False
-	elif len(selection) > 1:
-		btn_edit.disabled = True
-		btn_sub.disabled = False
-	else:
-		btn_edit.disabled = True
-		btn_sub.disabled = True
+	btn_edit.disabled = True
+	btn_sub.disabled = True
+	del selection[:]
 		
 def selectArgVal(*args):
 	print("In procedure to select arg values")
+	btn_sub = args[0]
+	btn_sub.disabled = False
+	
+def deleteArgumentValues(*args):
+	print("In procedure to delete seleted arguments")
+	
 		
 	
 def createP1(*args):
@@ -436,26 +448,14 @@ def createP1(*args):
 		
 		
 	if popupTitle == 'Add Values':
-		selection = args[3][0]
+		selectionArgumentID = args[3]
 		dbConn = args[4]
-		print(selection)
+		selectionArgumentValues = []
+		print("Argument ID: " + str(selectionArgumentID[0]))
 		boxLayout  = BoxLayout(orientation='horizontal',size_hint=(1,.6))
 		boxLayoutSmall = BoxLayout(orientation='vertical',size_hint=(.5,1))
-		labelArg = Label(text="Argument Values:",font_size=10, color=(0,1,0,1))
+		labelArg = Label(text="Argument values found:",font_size=14, color=(0,1,0,1))
 		boxLayoutSmall.add_widget(labelArg)
-		for eachValue in dbConn.dictOfArgVal2[selection]:
-			valueType = eachValue[0]
-			defaultValue = eachValue[1]
-			formatString = 'Value Type : ' + valueType + '\n' 
-			if valueType == 'IMP':
-				formatString = formatString + 'Imports data from: \n' + str(dbConn.dictOfArgVal[selection][0])
-				#print(dbConn.dictOfArgVal[selection])
-			else:
-				formatString = formatString + 'Default Value: ' + defaultValue			
-			btn_temp = myButton(text=formatString,font_size=8,color=(1,0,.5,.8))
-			boxLayoutSmall.add_widget(btn_temp)
-			btn_temp.bind(on_press=Par(selectArgVal))
-			
 		boxLayout.add_widget(boxLayoutSmall)
 		gridlayout = GridLayout(cols=2,id="gridlayoutID",size_hint=(.5,1))
 		boxLayout.add_widget(gridlayout)
@@ -467,12 +467,29 @@ def createP1(*args):
 		btn_sub.disabled = True
 		btn_add.disabled = True
 		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
+		btn_plus.bind(on_press=Par(addDetails,gridlayout,btn_add))
+		btn_add.bind(on_press=Par(DBConn.saveArgumentValue,gridlayout,selectionArgumentID,dbConn,boxLayoutSmall))
+		btn_sub.bind(on_press=Par(DBConn.deleteArgumentValues,selectionArgumentID,selectionArgumentValues))
+		for eachValue in dbConn.dictOfArgVal2[selectionArgumentID[0]]:
+			valueType = eachValue[0]
+			defaultValue = eachValue[1]
+			formatString = 'Value Type : ' + valueType + '\n' 
+			if valueType == 'IMP':
+				formatString = formatString + 'Imports data from {Command,importTag}: \n' 
+				for eachValue in dbConn.dictOfArgVal[selectionArgumentID[0]]:
+					if 'IMP' in eachValue:
+						formatString = formatString + str(re.findall(r'({.*?})',eachValue))
+				#print(dbConn.dictOfArgVal[selectionArgumentID])
+			else:
+				formatString = formatString + 'Default Value: ' + defaultValue			
+			btn_temp = myButton(text=formatString,font_size=10,color=(1,0,.5,.8))
+			boxLayoutSmall.add_widget(btn_temp)
+			btn_temp.bind(on_press=Par(selectArgVal,btn_sub))
 		box.add_widget(boxSmall)
-		box.add_widget(btn_add)
 		box.add_widget(btn_sub)
+		box.add_widget(btn_add)		
 		mainBox.add_widget(boxLayout)
 		mainBox.add_widget(box)
-		btn_plus.bind(on_press=Par(addDetails,gridlayout,btn_add))
 	
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
@@ -485,6 +502,9 @@ def createP1(*args):
 	if popupTitle == 'Commands':
 		btn_cancel.bind(on_press=Par(enableAll,gridlayout))
 		return popup1, gridlayout
+	elif popupTitle == 'Add Values':
+		btn_add.bind(on_release=popup1.dismiss)
+		return popup1
 	elif popupTitle == 'Add Argument':
 		btn_save.bind(on_release=popup1.dismiss)
 		return popup1
