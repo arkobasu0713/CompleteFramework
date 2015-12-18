@@ -188,31 +188,42 @@ def deleteCommand(conn,commandIDs,softPackageID):
 		for eachArgID in conn.dictOfCommandArguments[eachCommandID]:
 			argumentIDs.append(eachArgID)
 	
-	tupOfArg = tuple(argumentIDs)
-	print(tupOfArg)
-	
 	listOfArg = [int(i) for i in argumentIDs]
 	tupOfArg = (tuple(listOfArg))
+	print(tupOfArg)
+	
+	
 	if len(tupOfArg) > 1:
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID IN " + str(tupOfArg)
 		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID IN" + str(tupOfArg)
+		print(deleteArgData)
+		print(deleteValuesData)
 	elif len(tupOfArg) == 1 :
 		deleteArgData = "DELETE FROM ARGUMENTS WHERE SOFTWARE_PACKAGE_ID = %s AND ARGUMENT_ID = " +str(tupOfArg[0])
 		deleteValuesData = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID = " +str(tupOfArg[0])
-	print(deleteArgData)
-	print(deleteValuesData)
+		print(deleteArgData)
+		print(deleteValuesData)
+	else:
+		deleteValuesData = ''
+		deleteArgData = ''
 	#print(commandIDs)
 	#print(softPackageID)
 	try:
 		flag1 =0
 		flag2 =0
 		flag3 =0
-		conn.cursor.execute(deleteValuesData)
-		flag1=1
-		conn.cnx.commit()
-		conn.cursor.execute(deleteArgData,[conn.softwarePackageID,])
-		flag2=1
-		conn.cnx.commit()
+		if deleteValuesData != '':
+			conn.cursor.execute(deleteValuesData)
+			flag1=1
+			conn.cnx.commit()
+		elif deleteValuesData == '':
+			flag = 1
+		if deleteArgData != '':
+			conn.cursor.execute(deleteArgData,[conn.softwarePackageID,])
+			flag2=1
+			conn.cnx.commit()
+		elif deleteArgData == '':
+			flag2=1
 		for eachCommandID in commandIDs:
 			conn.cursor.execute(deleteCommand_query,[eachCommandID,softPackageID,])
 		flag3=1

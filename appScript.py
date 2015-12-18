@@ -33,7 +33,6 @@ class AutomatedFrameworkForSoftwareTesting(App):
 		sm.add_widget(ApplicationControlScreen(name='ApplicationConsole'))
 		sm.add_widget(DisplayResultsScreen(name='DisplayResultsScreen'))
 		sm.add_widget(CreateScreen(name='Create'))
-		sm.add_widget(CreateCommandScreen(name='CreateCommandScreen'))
 		sm.add_widget(CreateNewTestSuitScreen(name='CreateNewTestSuitScreen'))
 		sm.add_widget(EditTestSuitScreen(name='EditTestSuitScreen'))
 		return sm

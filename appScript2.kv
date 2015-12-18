@@ -36,6 +36,7 @@
 			text: 'Back to Home Screen'
 			background_color: (1,0,0,1)
 			on_press: root.manager.current = 'WelcomeScreen'
+			
 <CreateScreen>:
 	name: 'Create'
 	canvas.before:
@@ -132,7 +133,7 @@
 			Button:
 				text: 'Create New Command'
 				color: (1,1,0,1)
-				on_press: root.manager.current = 'CreateCommandScreen'
+				on_press: root.addCommand()
 			Button: 
 				text: 'Edit Commands'
 				color: (1,1,0,1)
@@ -239,63 +240,6 @@
 				background_color: (1,0,0,1)
 				on_press: root.manager.current = 'ApplicationConsole'
 				size_hint: (1,.2)
-
-<CreateCommandScreen>:
-	name: 'CreateCommandScreen'
-	canvas.before:
-		Color:
-			rgb: 0,0,.3
-		Rectangle:
-			pos: self.pos
-			size: self.size
-	BoxLayout:
-		orientation: 'vertical'
-		Label:
-			text: 'Enter Command details below'
-			color: (1,0,0,1)
-			size_hint: (1,.15)
-			bold: True
-		GridLayout:
-			cols:2
-			size_hint: (1,.25)
-			Label: 
-				text: 'Command Name'
-				size_hint: (1,.1)
-			TextInput:
-				id: id_command_name_entry_CCS
-				size_hint: (1,.25)
-			BoxLayout:
-				orientation: 'horizontal'
-				Label:
-					text: 'Has Mandatory arguments'
-					color: (1,1,0,1)
-				CheckBox:
-					id: id_checkBox_CCS
-					on_active: root.hasMand = 1
-			BoxLayout:
-				orientation: 'horizontal'
-				Label:
-					text: 'Has Optional Arguments'
-					color: (1,1,0,1)
-				CheckBox:
-					id: id_checkBox_DPDS
-					on_active: root.hasOpt = 1
-
-		Button:
-			text: 'Save to Database'
-			background_color: (1,0,0,1)
-			size_hint: (1,.1)
-			on_press: root.saveCommand()
-		GridLayout:
-			id: id_grid_layout_for_arguments_CCS
-			cols: 4
-			size_hint: (1,.3)
-			
-		Button:
-			text: 'Back'
-			background_color: (1,0,0,1)
-			on_press: root.manager.current = 'DisplayPackagesDetailsScreen'
-			size_hint: (1,.15)
 
 <CreateNewTestSuitScreen>:
 	name: 'CreateNewTestSuitScreen'

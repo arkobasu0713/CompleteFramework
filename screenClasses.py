@@ -28,33 +28,6 @@ sm = ScreenManager()
 global mapDriveAt
 mapDriveAt = ''
 
-
-class CreateCommandScreen(Screen):
-	pass
-	def __init__(self,**kwargs):
-		super(CreateCommandScreen,self).__init__(**kwargs)
-		self.hasMand = 0
-		self.hasOpt = 0
-
-	def addArgument(self):
-		print("Popup for adding argument")
-
-
-	def saveCommand(self):
-		commandName = self.ids.id_command_name_entry_CCS.text
-		if commandName != '':
-			ret = DBConn.processNewEntryCommand(commandName,conn,self.hasMand,self.hasOpt)
-			print(ret)
-			if ret == 'Success':
-				popup = UTIL.createP1('Success','Create Command','Successful transaction on table SOFTWARE_COMMANDS for creating Command')
-				popup.open()
-			else:
-				popup = UTIL.createP1('Failure','Create Command','Unsuccessful transaction on table SOFTWARE_COMMANDS',ret)
-				popup.open()
-		else:
-			print("Enter command name")
-
-
 class EditCommandScreen(Screen):
 	def __init__(self,**kwargs):
 		super(EditCommandScreen,self).__init__(**kwargs)
@@ -239,6 +212,11 @@ class DisplayPackagesDetailsScreen(Screen):
 		print("Selection: " + str(args[0]))
 		self.comSelect.append(args[0])
 		self.buttonIDList.append(args[1])
+		
+	def addCommand(self,*args):
+		print("Generating popup for creating command")
+		popup = UTIL.createP1('Add Command details below','Create Command','',conn)
+		popup.open()
 
 	def mapDrive(self):
 		self.mapDriveAt = UTIL.mappingNetworkDrive()

@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.button import Button
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -120,6 +121,34 @@ def extractData(gridLayout):
 	return gridLayout.children[4].text, gridLayout.children[2].text, gridLayout.children[0].text
 	
 	
+def saveCommand(*args):
+	textInpt = args[0]
+	chkBox1 = args[1]
+	chkBox2 = args[2]
+	conn = args[3]
+	hasMand = 0
+	hasOpt = 0
+	commandName = textInpt.text
+	#print('Command Name: ' + str(commandName))
+	if chkBox1.active:
+	#	print(chkBox1.active)
+		hasMand = 1
+	if chkBox2.active:
+	#	print(chkBox2.active)
+		hasOpt = 1 
+
+	if commandName != '':
+		ret = DBConn.processNewEntryCommand(commandName,conn,hasMand,hasOpt)
+		print(ret)
+		if ret == 'Success':
+			popup = createP1('Success','Saving Command','Successful transaction on table SOFTWARE_COMMANDS for creating Command')
+			popup.open()
+		else:
+			popup = createP1('Failure','Saving Command','Unsuccessful transaction on table SOFTWARE_COMMANDS',ret)
+			popup.open()
+	else:
+		print("Enter command name")
+		
 def createPopupExit(sm):
 	box = BoxLayout()
 	btn1 = Button(text='Yes')
@@ -384,7 +413,6 @@ def createP1(*args):
 	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.2),id="innerButtonControlBoxID")
 	btn_ok = Button(text='Ok',background_color=(1,0,0,1),id="btn_okID")
 	
-
 	innerButtonControlBox.add_widget(btn_ok)
 	mainBox.add_widget(label)
 	
@@ -516,6 +544,30 @@ def createP1(*args):
 		box.add_widget(btn_add)		
 		mainBox.add_widget(boxLayout)
 		mainBox.add_widget(box)
+		
+	if popupTitle == 'Create Command':
+		conn = args[3]
+		gridlayout = GridLayout(cols=2)
+		label1 = Label(text='Command Name')
+		textInpt = TextInput(id='id_command_name_entry_CCS',size_hint=(1,.25))
+		boxSmall1 = BoxLayout(orientation='horizontal')
+		la1 = Label(text='Has Mandatory arguments',font_size=10)
+		chkBox1 = CheckBox(id='id_checkBox_1')
+		boxSmall1.add_widget(la1)
+		boxSmall1.add_widget(chkBox1)
+		boxSmall2 = BoxLayout(orientation='horizontal')
+		la2 = Label(text='Has Optional arguments',font_size=10)
+		chkBox2 = CheckBox(id='id_checkBox_2')
+		boxSmall2.add_widget(la2)
+		boxSmall2.add_widget(chkBox2)
+		gridlayout.add_widget(label1)
+		gridlayout.add_widget(textInpt)
+		gridlayout.add_widget(boxSmall1)
+		gridlayout.add_widget(boxSmall2)
+		mainBox.add_widget(gridlayout)
+		btn_save = Button(text='Save to Database',background_color=(1,0,0,1))
+		btn_save.bind(on_press=Par(saveCommand,textInpt,chkBox1,chkBox2,conn))
+		innerButtonControlBox.add_widget(btn_save)
 	
 	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
 	
