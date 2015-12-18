@@ -304,9 +304,8 @@ def deleteSelectedArguments(*args):
 		for children in grid.children:
 			if children.id in selection:
 				grid.remove_widget(children)
-			if children.id in selection:
 				selection.remove(children.id)
-	
+		
 	
 	if len(selection) == 1:
 		btn_edit.disabled = False
@@ -352,12 +351,17 @@ def refreshContents(*args):
 def selectArgVal(*args):
 	print("In procedure to select arg values")
 	btn_sub = args[0]
-	btn_sub.disabled = False
-	
-def deleteArgumentValues(*args):
-	print("In procedure to delete seleted arguments")
-	
-		
+	selectionArgumentValues = args[1]
+	eachValueSet = args[2]
+	if eachValueSet in selectionArgumentValues:
+		selectionArgumentValues.remove(eachValueSet)
+	else:
+		selectionArgumentValues.append(eachValueSet)
+	if len(selectionArgumentValues) >=1:
+		btn_sub.disabled = False
+	else:
+		btn_sub.disabled = True
+				
 	
 def createP1(*args):
 	stat = args[0]
@@ -469,22 +473,23 @@ def createP1(*args):
 		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
 		btn_plus.bind(on_press=Par(addDetails,gridlayout,btn_add))
 		btn_add.bind(on_press=Par(DBConn.saveArgumentValue,gridlayout,selectionArgumentID,dbConn,boxLayoutSmall))
-		btn_sub.bind(on_press=Par(DBConn.deleteArgumentValues,selectionArgumentID,selectionArgumentValues))
+		btn_sub.bind(on_press=Par(DBConn.deleteArgumentValues,selectionArgumentID[0],selectionArgumentValues,dbConn))
+		print(dbConn.dictOfArgVal2[selectionArgumentID[0]])
 		for eachValue in dbConn.dictOfArgVal2[selectionArgumentID[0]]:
 			valueType = eachValue[0]
 			defaultValue = eachValue[1]
 			formatString = 'Value Type : ' + valueType + '\n' 
 			if valueType == 'IMP':
 				formatString = formatString + 'Imports data from {Command,importTag}: \n' 
-				for eachValue in dbConn.dictOfArgVal[selectionArgumentID[0]]:
-					if 'IMP' in eachValue:
-						formatString = formatString + str(re.findall(r'({.*?})',eachValue))
+				for eachValue1 in dbConn.dictOfArgVal[selectionArgumentID[0]]:
+					if 'IMP' in eachValue1:
+						formatString = formatString + str(re.findall(r'({.*?})',eachValue1))
 				#print(dbConn.dictOfArgVal[selectionArgumentID])
 			else:
 				formatString = formatString + 'Default Value: ' + defaultValue			
 			btn_temp = myButton(text=formatString,font_size=10,color=(1,0,.5,.8))
 			boxLayoutSmall.add_widget(btn_temp)
-			btn_temp.bind(on_press=Par(selectArgVal,btn_sub))
+			btn_temp.bind(on_press=Par(selectArgVal,btn_sub,selectionArgumentValues,eachValue))
 		box.add_widget(boxSmall)
 		box.add_widget(btn_sub)
 		box.add_widget(btn_add)		
@@ -504,6 +509,7 @@ def createP1(*args):
 		return popup1, gridlayout
 	elif popupTitle == 'Add Values':
 		btn_add.bind(on_release=popup1.dismiss)
+		btn_sub.bind(on_release=popup1.dismiss)
 		return popup1
 	elif popupTitle == 'Add Argument':
 		btn_save.bind(on_release=popup1.dismiss)

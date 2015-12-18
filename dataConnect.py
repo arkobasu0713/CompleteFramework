@@ -44,6 +44,29 @@ def saveArgumentValue(*args):
 	
 def deleteArgumentValues(*args):
 	print("In procedure to delete argument values")
+	print("Argument ID: " + str(args[0]))
+	print("Argument Values to be deleted: "+str(args[1]))
+	conn = args[2]
+	try:
+		for eachValueSet in args[1]:
+			query = "DELETE FROM ARGUMENT_VALUES WHERE ARGUMENT_ID = {0} AND ARGUMENT_VAL_TYPE = '{1}' and DEFAULT_VALUE = '{2}'".format(args[0],eachValueSet[0],eachValueSet[1])
+			print(query)
+			conn.cursor.execute(query)
+			conn.cnx.commit()
+			
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		#return e
+		popupFailure = createP1('Failure','Deletion of Selected Argument Values',"Unsuccessful transaction on table ARGUMENT_VALUES",e)
+		popupFailure.open()
+	else:
+		#return 'Success'
+		popupSuccess = createP1('Success','Deletion of selected arguments values',"Successful transaction on table ARGUMENT_VALUES")
+		popupSuccess.open()
+		print('Success')
+	
 
 def deleteArgDetails(listOfArgIDs,conn):
 	listOfArg = [int(i) for i in listOfArgIDs]
