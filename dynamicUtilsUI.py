@@ -242,26 +242,31 @@ def editSelection(*args):
 	
 	
 def selectArg(*args):
-	#print("In Select Argument inside popup")
+	print("In Select Argument inside popup")
 	btn = args[0]
 	selection = args[1]
-	btn_edit = args[2]
-	btn_sub = args[3]
-	if btn.id not in selection:
-		selection.append(btn.id)
+	argumentID = args[2]
+	btn_edit = args[3]
+	btn_sub = args[4]
+	btn_testSuit = args[5]
+	if argumentID not in selection:
+		selection.append(argumentID)
 	else:
-		selection.remove(btn.id)
-	#print(selection)
+		selection.remove(argumentID)
+	print(selection)
 		
 	if len(selection) == 1:
 		btn_edit.disabled = False
 		btn_sub.disabled = False
+		btn_testSuit.disabled = True
 	elif len(selection) > 1:
 		btn_edit.disabled = True
 		btn_sub.disabled = False
+		btn_testSuit.disabled = False
 	else:
 		btn_edit.disabled = True
 		btn_sub.disabled = True
+		btn_testSuit.disabled = True
 		
 def addDetails(*args):
 	print("In procedure to add details")
@@ -336,13 +341,14 @@ def refreshContents(*args):
 	print(selection)
 	btn_edit = args[4]
 	btn_sub = args[5]
+	btn_testSuit = args[6]
 	conn.fetchArgumentsForSelectCommands(commandList)
 	conn.retreiveValuesForArguments()
 	for eachArg in conn.dictOfArguments:
 		string = "{arg}".format(arg=conn.dictOfArguments[eachArg])
 		btn = myButton(text=string,id=str(eachArg))
 		grid.add_widget(btn)
-		btn.bind(on_press=Par(selectArg,btn,selection,btn_edit,btn_sub))
+		btn.bind(on_press=Par(selectArg,btn,selection,eachArg,btn_edit,btn_sub,btn_testSuit))
 		
 	btn_edit.disabled = True
 	btn_sub.disabled = True
@@ -361,7 +367,12 @@ def selectArgVal(*args):
 		btn_sub.disabled = False
 	else:
 		btn_sub.disabled = True
-				
+		
+def createTestSuit(*args):
+	print("In procedure to create custom test suit with multiple arguments")
+	btn_testSuit = args[0]
+	argumentIDs = args[1]
+	btn_testSuit.disabled = False		
 	
 def createP1(*args):
 	stat = args[0]
@@ -370,7 +381,7 @@ def createP1(*args):
 	netText = stat + '\n' + message
 	mainBox = BoxLayout(orientation='vertical',id="mainBoxID")
 	label = Label(text=netText, color=(1,1,0,1),size_hint=(1,.15),id="labelID",multiline=True)
-	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.1),id="innerButtonControlBoxID")
+	innerButtonControlBox = BoxLayout(orientation='horizontal', size_hint=(1,.2),id="innerButtonControlBoxID")
 	btn_ok = Button(text='Ok',background_color=(1,0,0,1),id="btn_okID")
 	
 
@@ -390,30 +401,40 @@ def createP1(*args):
 		dictOfArgVal = args[6]
 		command = args[7][0]
 		print(command)
+		argumentIDs = []
 		#print(dictOfArgVal)
-		gridlayout = GridLayout(cols=2,id="gridlayoutID")
-		btn_refresh = Button(text='Refresh Content',font_size=12,background_color=(0,1,0,1))
-		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1))
-		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1))
+		gridlayout = GridLayout(cols=4,id="gridlayoutID")
+		boxlayout = BoxLayout(orientation='horizontal',size_hint=(1,.75))
+		labelForNewTestSuit = Label(text='Argument Sets:',color=(1,0,0,1),id="label1ID",font_size=8)
+		boxlayout.add_widget(labelForNewTestSuit)
+		btn_refresh = Button(text='Refresh Content',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
+		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
+		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1),size_hint=(.35,1))
+		btn_testSuit = Button(text='Add Test Suit',font_size=12,background_color=(0,1,0,1),size_hint=(.25,1))
 		btn_sub.disabled = True
-		box = BoxLayout(orientation='horizontal',size_hint=(1,.1))
+		btn_testSuit.disabled = True
+		box = BoxLayout(orientation='horizontal',size_hint=(1,.2))
 		box.add_widget(btn_refresh)
 		box.add_widget(btn_add)
 		box.add_widget(btn_sub)
+		box.add_widget(btn_testSuit)
 		mainBox.add_widget(gridlayout)
-		mainBox.add_widget(box)
+		mainBox.add_widget(boxlayout)
+		mainBox.add_widget(box)		
 		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
 		btn_edit.bind(on_press=Par(editSelection,selection,dbConn))
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
-		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub))
+		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit))
+		btn_testSuit.bind(on_press=Par(createTestSuit,btn_testSuit,argumentIDs))
 		btn_edit.disabled = True
 		innerButtonControlBox.add_widget(btn_edit)
+		print(dictOfArguments)
 		for eachArg in dictOfArguments:
-			string = "{arg}".format(arg=args[3][eachArg])
+			string = "{arg}".format(arg=dictOfArguments[eachArg])
 			btn = myButton(text=string,id=str(eachArg))
 			gridlayout.add_widget(btn)
-			btn.bind(on_press=Par(selectArg,btn,selection,btn_edit,btn_sub))
+			btn.bind(on_press=Par(selectArg,btn,selection,eachArg,btn_edit,btn_sub,btn_testSuit))
 		
 	if popupTitle == 'Add Argument':
 		dictOfCommands = args[3]
