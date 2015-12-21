@@ -23,10 +23,12 @@ def saveTestSuit(*args):
 	print("CommandID: " + str(command))
 	print("ArgumentIDs: "+ str(argumentIDs))
 	print("TestSuitName: " + testSuitName)
+	testSuitID = random.randint(0,9999)
+	print("TestSuitID: " + str(testSuitID))
 	
 	try:
 		for eachArgumentID in argumentIDs:
-			query = "INSERT INTO SOFTWARE_COMMAND_TEST_SUIT VALUES ({0},{1},{4},'{2}',{3})".format(softwarePackageID,command,testSuitName,eachArgumentID,'NULL')
+			query = "INSERT INTO SOFTWARE_COMMAND_TEST_SUIT VALUES ({0},{1},{4},'{2}',{3})".format(softwarePackageID,command,testSuitName,eachArgumentID,testSuitID)
 			print(query)
 			conn.cursor.execute(query)
 			conn.cnx.commit()
@@ -395,6 +397,23 @@ class enterDBSpace():
 
 			for i in range(len(argID)):
 				self.dictOfArguments[argID[i]] = arg[i]
+				
+	def fetchTestSuits(self,*args):
+		commandID = args[0]
+		grid = args[1]
+		grid.clear_widgets()
+		print(grid)
+		query1 = "select distinct TEST_SUIT_ID, TEST_SUIT_DESC FROM SOFTWARE_COMMAND_TEST_SUIT WHERE SOFTWARE_PACKAGE_ID = {0} AND COMMAND_ID = {1}".format(self.softwarePackageID,commandID)
+		print(query1)
+		self.cursor.execute(query1)
+		data = self.cursor.fetchall()
+		print(data)
+		for eachDataSet in data:
+			testSuitID = eachDataSet[0]
+			testSuitName = eachDataSet[1]
+			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+			grid.add_widget(btn)
+		
 
 	def retreiveValuesForArguments(self):
 		self.dictOfArgVal = {}

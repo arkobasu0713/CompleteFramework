@@ -66,6 +66,7 @@ class EditCommandScreen(Screen):
 			popupFailure.open()
 
 	def selectCommand(self,*args):
+		print("In selectCommand: ")
 		if args[0] not in self.commandList:
 			self.commandList.append(args[0])
 		else:
@@ -193,6 +194,8 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.folderName = ''
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
+		
+		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
 
 		self.ids.grid_id_commands_DPDS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
@@ -209,9 +212,12 @@ class DisplayPackagesDetailsScreen(Screen):
 			self.runScript = 'N'
 		
 	def addSelection(self,*args):
-		print("Selection: " + str(args[0]))
-		self.comSelect.append(args[0])
+		commandID = args[0]
+		print("Selection: " + str(commandID))
+		self.comSelect.append(commandID)
 		self.buttonIDList.append(args[1])
+		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
+		conn.fetchTestSuits(commandID,self.ids.grid_id_customTestSuit_DPDS)
 		
 	def addCommand(self,*args):
 		print("Generating popup for creating command")
@@ -277,6 +283,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 
 		self.ids.grid_id_commands_DPDS.clear_widgets()
+		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
 		for eachCommand in conn.dictOfCommands:
 			idString = "button_id_" +str(eachCommand) + "_DPDS"
 			btn_temp = UTIL.myButton(text=conn.dictOfCommands[eachCommand], id=idString, background_color= (1,1,0,1))

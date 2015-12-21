@@ -371,6 +371,8 @@ def refreshContents(*args):
 	btn_edit = args[4]
 	btn_sub = args[5]
 	btn_testSuit = args[6]
+	boxlayout = args[7]
+	boxlayout.clear_widgets()
 	conn.fetchArgumentsForSelectCommands(commandList)
 	conn.retreiveValuesForArguments()
 	for eachArg in conn.dictOfArguments:
@@ -454,8 +456,8 @@ def createP1(*args):
 		#print(dictOfArgVal)
 		gridlayout = GridLayout(cols=4,id="gridlayoutID")
 		boxlayout = BoxLayout(orientation='horizontal',size_hint=(1,.75))
-		labelForNewTestSuit = Label(text='Argument Sets:',color=(1,0,0,1),id="label1ID",font_size=8)
-		boxlayout.add_widget(labelForNewTestSuit)
+		labelForNewTestSuit = Label(text='TestSuits Sets:',color=(1,0,0,1),id="label1ID",font_size=8,size_hint=(1,.1))
+		dbConn.fetchTestSuits(command,boxlayout)
 		btn_refresh = Button(text='Refresh Content',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
 		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
 		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1),size_hint=(.35,1))
@@ -468,13 +470,14 @@ def createP1(*args):
 		box.add_widget(btn_sub)
 		box.add_widget(btn_testSuit)
 		mainBox.add_widget(gridlayout)
+		mainBox.add_widget(labelForNewTestSuit)
 		mainBox.add_widget(boxlayout)
 		mainBox.add_widget(box)		
 		btn_edit = Button(text='Edit',background_color=(1,0,0,1))
 		btn_edit.bind(on_press=Par(editSelection,selection,dbConn))
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
-		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit))
+		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit,boxlayout))
 		btn_testSuit.bind(on_press=Par(createTestSuit,btn_testSuit,dbConn,selection,command))
 		btn_edit.disabled = True
 		innerButtonControlBox.add_widget(btn_edit)
