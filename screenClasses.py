@@ -180,6 +180,7 @@ class CreateNewTestSuitScreen(Screen):
 def selectTestSuit(*args):
 	testSuitID = args[0]
 	testSuitSelection = args[1]
+	commandID = args[2]
 	if testSuitID in testSuitSelection:
 		testSuitSelection.remove(testSuitID)
 	else:
@@ -204,6 +205,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.logFilePath = ''
 		self.folderName = ''
 		self.testSuitSelection = [] 
+		self.commandID = ''
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 		
@@ -235,6 +237,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		
 		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
 		if commandID in self.comSelect:
+			self.commandID = commandID
 			data = conn.fetchTestSuits(commandID)
 			if data is not None:
 				for eachDataSet in data:
@@ -243,6 +246,8 @@ class DisplayPackagesDetailsScreen(Screen):
 					btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
 					self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
 					btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection))
+		else:
+			self.commandID = ''
 		
 	def addCommand(self,*args):
 		print("Generating popup for creating command")
@@ -306,6 +311,7 @@ class DisplayPackagesDetailsScreen(Screen):
 	def runTestSuits(self):
 		print("In procedure to run for selected test suits")
 		print(self.testSuitSelection)
+		print(self.commandID)
 
 	def refreshContents(self):
 		conn.reEstablishConnection()
