@@ -176,7 +176,18 @@ class ApplicationControlScreen(Screen):
 
 class CreateNewTestSuitScreen(Screen):
 	pass
+	
+def selectTestSuit(*args):
+	testSuitID = args[0]
+	testSuitSelection = args[1]
+	if testSuitID in testSuitSelection:
+		testSuitSelection.remove(testSuitID)
+	else:
+		testSuitSelection.append(testSuitID)
 
+	print("In procedure of selecting test suits: ")
+	print(testSuitSelection)
+	
 class DisplayPackagesDetailsScreen(Screen):
 	
 	def __init__(self,**kwargs):
@@ -192,6 +203,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.mapDriveAt = ''
 		self.logFilePath = ''
 		self.folderName = ''
+		self.testSuitSelection = [] 
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
 		
@@ -229,6 +241,7 @@ class DisplayPackagesDetailsScreen(Screen):
 				testSuitName = eachDataSet[1]
 				btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
 				self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
+				btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection))
 		
 	def addCommand(self,*args):
 		print("Generating popup for creating command")
@@ -291,6 +304,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		
 	def runTestSuits(self):
 		print("In procedure to run for selected test suits")
+		print(self.testSuitSelection)
 
 	def refreshContents(self):
 		conn.reEstablishConnection()
