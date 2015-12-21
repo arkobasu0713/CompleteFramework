@@ -214,10 +214,21 @@ class DisplayPackagesDetailsScreen(Screen):
 	def addSelection(self,*args):
 		commandID = args[0]
 		print("Selection: " + str(commandID))
-		self.comSelect.append(commandID)
-		self.buttonIDList.append(args[1])
+		if commandID in self.comSelect:
+			self.comSelect.remove(commandID)
+			self.buttonIDList.remove(args[1])
+		else:
+			self.comSelect.append(commandID)
+			self.buttonIDList.append(args[1])
+		
 		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
-		conn.fetchTestSuits(commandID,self.ids.grid_id_customTestSuit_DPDS)
+		if commandID in self.comSelect:
+			data = conn.fetchTestSuits(commandID)
+			for eachDataSet in data:
+				testSuitID = eachDataSet[0]
+				testSuitName = eachDataSet[1]
+				btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+				self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
 		
 	def addCommand(self,*args):
 		print("Generating popup for creating command")
@@ -277,6 +288,9 @@ class DisplayPackagesDetailsScreen(Screen):
 	def goToEditScreen(self):
 		sm.add_widget(EditCommandScreen(name='EditCommandScreen'))
 		sm.current = 'EditCommandScreen'
+		
+	def runTestSuits(self):
+		print("In procedure to run for selected test suits")
 
 	def refreshContents(self):
 		conn.reEstablishConnection()

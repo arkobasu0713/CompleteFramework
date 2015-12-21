@@ -175,8 +175,15 @@
 			Button:
 				id: button_id2_DPDS
 				text: 'Run selected commands.'
-				size_hint: (.4,1)
+				size_hint: (.2,1)
+				font_size: 12
 				on_press: root.runCommandSuits()
+			Button:
+				id: button_id4_DPDS
+				text: 'Run selected test suits.'
+				size_hint: (.2,1)
+				font_size: 12
+				on_press: root.runTestSuits()
 		BoxLayout:
 			orientation: 'horizontal'
 			size_hint: (1,.15)

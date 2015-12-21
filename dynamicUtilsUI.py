@@ -365,16 +365,24 @@ def refreshContents(*args):
 	grid = args[0]
 	grid.clear_widgets()
 	conn = args[1]
-	commandList = [args[2]]
+	commandID = [args[2]]
 	selection = args[3]
 	print(selection)
 	btn_edit = args[4]
 	btn_sub = args[5]
 	btn_testSuit = args[6]
 	boxlayout = args[7]
+	btn_sub_testSuit = args[8]
+	btn_sub_testSuit.disabled = True
 	boxlayout.clear_widgets()
-	conn.fetchArgumentsForSelectCommands(commandList)
+	conn.fetchArgumentsForSelectCommands(commandID)
 	conn.retreiveValuesForArguments()
+	data = conn.fetchTestSuits(commandID[0])
+	for eachDataSet in data:
+			testSuitID = eachDataSet[0]
+			testSuitName = eachDataSet[1]
+			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+			boxlayout.add_widget(btn)
 	for eachArg in conn.dictOfArguments:
 		string = "{arg}".format(arg=conn.dictOfArguments[eachArg])
 		btn = myButton(text=string,id=str(eachArg))
@@ -426,6 +434,21 @@ def createTestSuit(*args):
 	btn_ok.bind(on_press=Par(DBConn.saveTestSuit,conn,command,argumentIDs,textInput))
 	btn_ok.bind(on_release=popup.dismiss)
 	
+	
+def selectTestSuit(*args):
+	testSuitSelection = args [0]
+	testSuitID = args[1]
+	btn_sub_testSuit = args[2]
+	if testSuitID in testSuitSelection:
+		testSuitSelection.remove(testSuitID)
+	else:
+		testSuitSelection.append(testSuitID)
+	
+	if len(testSuitSelection) > 0:
+		btn_sub_testSuit.disabled = False
+		
+
+
 def createP1(*args):
 	stat = args[0]
 	popupTitle = args[1]
@@ -446,6 +469,7 @@ def createP1(*args):
 		
 	if popupTitle == 'Display Argument Details':
 		selection = []
+		testSuitSelection = []
 		dictOfArguments = args[3]
 		dictOfCommands = args[4]
 		dbConn = args[5]
@@ -455,20 +479,23 @@ def createP1(*args):
 		argumentIDs = []
 		#print(dictOfArgVal)
 		gridlayout = GridLayout(cols=4,id="gridlayoutID")
-		boxlayout = BoxLayout(orientation='horizontal',size_hint=(1,.75))
-		labelForNewTestSuit = Label(text='TestSuits Sets:',color=(1,0,0,1),id="label1ID",font_size=8,size_hint=(1,.1))
-		dbConn.fetchTestSuits(command,boxlayout)
-		btn_refresh = Button(text='Refresh Content',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
-		btn_add = Button(text='Add Argument',font_size=12,background_color=(0,1,0,1),size_hint=(.2,1))
-		btn_sub = Button(text='Delete Selected Arguments',font_size=12,background_color=(0,1,0,1),size_hint=(.35,1))
-		btn_testSuit = Button(text='Add Test Suit',font_size=12,background_color=(0,1,0,1),size_hint=(.25,1))
+		boxlayout = GridLayout(cols=4,size_hint=(1,.75))
+		labelForNewTestSuit = Label(text='TestSuits Sets:',color=(1,0,0,1),id="label1ID",font_size=11,size_hint=(1,.1))
+		data = dbConn.fetchTestSuits(command)
+		btn_refresh = Button(text='Refresh Content',font_size=10,background_color=(0,1,0,1),size_hint=(.15,1))
+		btn_add = Button(text='Add Argument',font_size=10,background_color=(0,1,0,1),size_hint=(.15,1))
+		btn_sub = Button(text='Delete Selected Arguments',font_size=10,background_color=(0,1,0,1),size_hint=(.25,1))
+		btn_testSuit = Button(text='Add Test Suit',font_size=10,background_color=(0,1,0,1),size_hint=(.15,1))
+		btn_sub_testSuit = Button(text='Delete Selected Test Suits',font_size=10,background_color=(0,1,0,1),size_hint=(.3,1))
 		btn_sub.disabled = True
 		btn_testSuit.disabled = True
+		btn_sub_testSuit.disabled = True
 		box = BoxLayout(orientation='horizontal',size_hint=(1,.2))
 		box.add_widget(btn_refresh)
 		box.add_widget(btn_add)
 		box.add_widget(btn_sub)
 		box.add_widget(btn_testSuit)
+		box.add_widget(btn_sub_testSuit)
 		mainBox.add_widget(gridlayout)
 		mainBox.add_widget(labelForNewTestSuit)
 		mainBox.add_widget(boxlayout)
@@ -477,8 +504,9 @@ def createP1(*args):
 		btn_edit.bind(on_press=Par(editSelection,selection,dbConn))
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
-		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit,boxlayout))
+		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit,boxlayout,btn_sub_testSuit))
 		btn_testSuit.bind(on_press=Par(createTestSuit,btn_testSuit,dbConn,selection,command))
+		btn_sub_testSuit.bind(on_press=Par(DBConn.deleteTestSuit,testSuitSelection,dbConn))
 		btn_edit.disabled = True
 		innerButtonControlBox.add_widget(btn_edit)
 		print(dictOfArguments)
@@ -487,6 +515,13 @@ def createP1(*args):
 			btn = myButton(text=string,id=str(eachArg))
 			gridlayout.add_widget(btn)
 			btn.bind(on_press=Par(selectArg,btn,selection,eachArg,btn_edit,btn_sub,btn_testSuit))
+			
+		for eachDataSet in data:
+			testSuitID = eachDataSet[0]
+			testSuitName = eachDataSet[1]
+			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+			boxlayout.add_widget(btn)
+			btn.bind(on_press=Par(selectTestSuit,testSuitSelection,testSuitID,btn_sub_testSuit))
 		
 	if popupTitle == 'Add Argument':
 		dictOfCommands = args[3]

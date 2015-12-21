@@ -11,6 +11,32 @@ import platform
 from mysql.connector import errorcode
 from dynamicUtilsUI import * 
 
+def deleteTestSuit(*args):
+	print("In procedure to delete list of selected test suits with ID")
+	testSuitSelection = tuple(args[0])
+	conn = args[1]
+	print(tuple(testSuitSelection))
+	if len(testSuitSelection) > 1:
+		query = "DELETE FROM SOFTWARE_COMMAND_TEST_SUIT WHERE TEST_SUIT_ID IN {0}".format(testSuitSelection)
+	else:
+		query = "DELETE FROM SOFTWARE_COMMAND_TEST_SUIT WHERE TEST_SUIT_ID = {0}".format(testSuitSelection[0])
+		
+	print(query)
+	try:
+		conn.cursor.execute(query)
+		conn.cnx.commit()
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		popupFailure = createP1('Failure','Database transaction of deleting test suits',"Unsuccessful transaction on table SOFTWARE_COMMAND_TEST_SUIT",e)
+		popupFailure.open()
+	else:
+		popupSuccess = createP1('Success','Database transaction of deleting test suits',"Successful transaction on table SOFTWARE_COMMAND_TEST_SUIT")
+		popupSuccess.open()
+		#boxForValueDisplay.add_widget()
+		print('Success')
+	
 def saveTestSuit(*args):
 	print("In procedure for saving test suits")
 	conn = args[0]
@@ -400,19 +426,12 @@ class enterDBSpace():
 				
 	def fetchTestSuits(self,*args):
 		commandID = args[0]
-		grid = args[1]
-		grid.clear_widgets()
-		print(grid)
 		query1 = "select distinct TEST_SUIT_ID, TEST_SUIT_DESC FROM SOFTWARE_COMMAND_TEST_SUIT WHERE SOFTWARE_PACKAGE_ID = {0} AND COMMAND_ID = {1}".format(self.softwarePackageID,commandID)
 		print(query1)
 		self.cursor.execute(query1)
 		data = self.cursor.fetchall()
 		print(data)
-		for eachDataSet in data:
-			testSuitID = eachDataSet[0]
-			testSuitName = eachDataSet[1]
-			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
-			grid.add_widget(btn)
+		return data
 		
 
 	def retreiveValuesForArguments(self):
