@@ -428,12 +428,36 @@ class enterDBSpace():
 		commandID = args[0]
 		query1 = "select distinct TEST_SUIT_ID, TEST_SUIT_DESC FROM SOFTWARE_COMMAND_TEST_SUIT WHERE SOFTWARE_PACKAGE_ID = {0} AND COMMAND_ID = {1}".format(self.softwarePackageID,commandID)
 		print(query1)
-		self.cursor.execute(query1)
-		data = self.cursor.fetchall()
-		print(data)
-		return data
+		try:
+			self.cursor.execute(query1)
+			data = self.cursor.fetchall()
+			print(data)
+		except MConn.Error as e:
+			print("Error code: " + str(e.errno))
+			print("Error Message: " + str(e.msg))
+			print(str(e))
+			return None
+		else:
+			return data
 		
-
+	def fetchArgumentsForTestSuit(self,*args):
+		print("In procedure to retreive argument ids for selected test suit")
+		testSuitID = args[0]
+		command = args[1]
+		print("TestSuitID: "+ str(testSuitID))
+		query = "SELECT SCTS.ARGUMENT_ID, ARG.ARGUMENT FROM SOFTWARE_COMMAND_TEST_SUIT SCTS, ARGUMENTS ARG WHERE SCTS.SOFTWARE_PACKAGE_ID = {0} AND SCTS.TEST_SUIT_ID = {1} AND SCTS.COMMAND_ID = {2} AND SCTS.SOFTWARE_PACKAGE_ID = ARG.SOFTWARE_PACKAGE_ID AND SCTS.COMMAND_ID = ARG.COMMAND_ID AND SCTS.ARGUMENT_ID = ARG.ARGUMENT_ID".format(self.softwarePackageID,testSuitID,command)
+		print(query)
+		try:
+			self.cursor.execute(query)
+			data = self.cursor.fetchall()
+		except MConn.Error as e:
+			print("Error code: " + str(e.errno))
+			print("Error Message: " + str(e.msg))
+			print(str(e))
+			return None
+		else:
+			return data
+			
 	def retreiveValuesForArguments(self):
 		self.dictOfArgVal = {}
 		self.dictOfArgVal2 = {}

@@ -378,11 +378,13 @@ def refreshContents(*args):
 	conn.fetchArgumentsForSelectCommands(commandID)
 	conn.retreiveValuesForArguments()
 	data = conn.fetchTestSuits(commandID[0])
-	for eachDataSet in data:
+	if data is not None:
+		for eachDataSet in data:
 			testSuitID = eachDataSet[0]
 			testSuitName = eachDataSet[1]
 			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
 			boxlayout.add_widget(btn)
+			
 	for eachArg in conn.dictOfArguments:
 		string = "{arg}".format(arg=conn.dictOfArguments[eachArg])
 		btn = myButton(text=string,id=str(eachArg))
@@ -439,13 +441,37 @@ def selectTestSuit(*args):
 	testSuitSelection = args [0]
 	testSuitID = args[1]
 	btn_sub_testSuit = args[2]
+	conn = args[3]
+	command = args[4]
+	gridlayout = args[5]
+	dictArgumentButtons = {}
 	if testSuitID in testSuitSelection:
 		testSuitSelection.remove(testSuitID)
 	else:
 		testSuitSelection.append(testSuitID)
-	
+	for eachChild in gridlayout.children:
+		dictArgumentButtons[int(eachChild.id)] = eachChild
+	print(dictArgumentButtons)
 	if len(testSuitSelection) > 0:
 		btn_sub_testSuit.disabled = False
+		if len(testSuitSelection) == 1:
+			data = conn.fetchArgumentsForTestSuit(testSuitSelection[0],command)
+			if data is not None:
+				argID = [x[0] for x in data]
+				arguments = [x[1] for x in data]
+				print(argID)
+				print(arguments)
+				for eachArgID in argID:
+					if eachArgID in dictArgumentButtons:
+						dictArgumentButtons[eachArgID].background_color = list([0,1,0,1])
+		else:
+			for eachChild in gridlayout.children:
+				eachChild.background_color = list([.5,.2,.2,1])
+	else:
+		btn_sub_testSuit.disabled = True
+		for eachChild in gridlayout.children:
+			eachChild.background_color = list([.5,.2,.2,1])
+		
 		
 
 
@@ -515,13 +541,13 @@ def createP1(*args):
 			btn = myButton(text=string,id=str(eachArg))
 			gridlayout.add_widget(btn)
 			btn.bind(on_press=Par(selectArg,btn,selection,eachArg,btn_edit,btn_sub,btn_testSuit))
-			
-		for eachDataSet in data:
-			testSuitID = eachDataSet[0]
-			testSuitName = eachDataSet[1]
-			btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
-			boxlayout.add_widget(btn)
-			btn.bind(on_press=Par(selectTestSuit,testSuitSelection,testSuitID,btn_sub_testSuit))
+		if data is not None:	
+			for eachDataSet in data:
+				testSuitID = eachDataSet[0]
+				testSuitName = eachDataSet[1]
+				btn = myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+				boxlayout.add_widget(btn)
+				btn.bind(on_press=Par(selectTestSuit,testSuitSelection,testSuitID,btn_sub_testSuit,dbConn,command,gridlayout))
 		
 	if popupTitle == 'Add Argument':
 		dictOfCommands = args[3]

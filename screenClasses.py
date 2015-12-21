@@ -236,12 +236,13 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.ids.grid_id_customTestSuit_DPDS.clear_widgets()
 		if commandID in self.comSelect:
 			data = conn.fetchTestSuits(commandID)
-			for eachDataSet in data:
-				testSuitID = eachDataSet[0]
-				testSuitName = eachDataSet[1]
-				btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
-				self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
-				btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection))
+			if data is not None:
+				for eachDataSet in data:
+					testSuitID = eachDataSet[0]
+					testSuitName = eachDataSet[1]
+					btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
+					self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
+					btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection))
 		
 	def addCommand(self,*args):
 		print("Generating popup for creating command")
