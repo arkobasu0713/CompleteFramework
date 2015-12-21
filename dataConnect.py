@@ -11,7 +11,36 @@ import platform
 from mysql.connector import errorcode
 from dynamicUtilsUI import * 
 
-
+def saveTestSuit(*args):
+	print("In procedure for saving test suits")
+	conn = args[0]
+	softwarePackageID = conn.softwarePackageID
+	command = args[1]
+	argumentIDs = args[2]
+	testSuitName = args[3].text
+	
+	print("SoftwarePackageID: " + str(softwarePackageID))
+	print("CommandID: " + str(command))
+	print("ArgumentIDs: "+ str(argumentIDs))
+	print("TestSuitName: " + testSuitName)
+	
+	try:
+		for eachArgumentID in argumentIDs:
+			query = "INSERT INTO SOFTWARE_COMMAND_TEST_SUIT VALUES ({0},{1},{4},'{2}',{3})".format(softwarePackageID,command,testSuitName,eachArgumentID,'NULL')
+			print(query)
+			conn.cursor.execute(query)
+			conn.cnx.commit()
+	except MConn.Error as e:
+		print("Error code: " + str(e.errno))
+		print("Error Message: " + str(e.msg))
+		print(str(e))
+		popupFailure = createP1('Failure','Database transaction of saving Test Suit',"Unsuccessful transaction on table SOFTWARE_COMMAND_TEST_SUIT",e)
+		popupFailure.open()
+	else:
+		popupSuccess = createP1('Success','Database transaction of saving Test Suit',"Successful transaction on table SOFTWARE_COMMAND_TEST_SUIT")
+		popupSuccess.open()
+		print('Success')
+		
 def saveArgumentValue(*args):
 	print("In procedure to save argument value")
 	selectionArgumentID = args[1][0]

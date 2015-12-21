@@ -313,7 +313,7 @@ def addDetails(*args):
 	gridlayout.add_widget(textInput)
 	gridlayout.add_widget(label3)
 	gridlayout.add_widget(textInput2)
-	kindOfValues = ['ABP','NSR','NER','STR']
+	kindOfValues = ['ABP','NSR','NER','STR','NBR']
 	dropdown = DropDown()
 	for eachType in kindOfValues:
 		btn_tmp = Button(text=eachType, size_hint_y=None, height=20)
@@ -400,8 +400,29 @@ def selectArgVal(*args):
 def createTestSuit(*args):
 	print("In procedure to create custom test suit with multiple arguments")
 	btn_testSuit = args[0]
-	argumentIDs = args[1]
+	conn = args[1]
+	softPackID = conn.softwarePackageID
+	command = args[3]
+	argumentIDs = args[2]
 	btn_testSuit.disabled = False		
+	box = BoxLayout(orientation='horizontal')
+	boxOuter = BoxLayout(orientation='vertical')
+	label = Label(text='Test Suit Name: ',color=(1,1,0,1))
+	textInput = TextInput(id='textInputPopupID')
+	box.add_widget(label)
+	box.add_widget(textInput)
+	innerButtonControlBox = BoxLayout(orientation='horizontal',id="innerButtonControlBoxID")
+	btn_ok = Button(text='Ok',background_color=(1,0,0,1),id="btn_okID")
+	btn_cancel = Button(text="Cancel",background_color=(1,0,0,1),id="buttonCanID")
+	innerButtonControlBox.add_widget(btn_ok)
+	innerButtonControlBox.add_widget(btn_cancel)
+	boxOuter.add_widget(box)
+	boxOuter.add_widget(innerButtonControlBox)
+	popup = Popup(title='Add Test Suit', content=boxOuter,size_hint=(None,None), size=(350,200), auto_dismiss=False)
+	popup.open()
+	btn_cancel.bind(on_press=popup.dismiss)
+	btn_ok.bind(on_press=Par(DBConn.saveTestSuit,conn,command,argumentIDs,textInput))
+	btn_ok.bind(on_release=popup.dismiss)
 	
 def createP1(*args):
 	stat = args[0]
@@ -454,7 +475,7 @@ def createP1(*args):
 		btn_add.bind(on_press=Par(addArgument,dictOfCommands,selection,dbConn,command))
 		btn_sub.bind(on_press=Par(deleteSelectedArguments,selection,dbConn,gridlayout,command,btn_edit,btn_sub))
 		btn_refresh.bind(on_press=Par(refreshContents,gridlayout,dbConn,command,selection,btn_edit,btn_sub,btn_testSuit))
-		btn_testSuit.bind(on_press=Par(createTestSuit,btn_testSuit,argumentIDs))
+		btn_testSuit.bind(on_press=Par(createTestSuit,btn_testSuit,dbConn,selection,command))
 		btn_edit.disabled = True
 		innerButtonControlBox.add_widget(btn_edit)
 		print(dictOfArguments)
