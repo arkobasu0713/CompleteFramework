@@ -469,7 +469,7 @@ class enterDBSpace():
 				#eachValType = [x[0] for x in data]
 				#defVal = [x[1] for x in data]
 				for eachValType, defVal in data:
-					if eachValType in ['ABP','STR']:
+					if eachValType in ['ABP','STR','NBR']:
 						listOfValues.append(defVal)
 					if eachValType == 'NSR' or eachValType == 'NER':
 						print('NSR/NER')
@@ -534,35 +534,36 @@ class enterDBSpace():
 
 		for eachTestSuitID in testSuitSelection:
 			writeFile = open(self.dictOfFileNames[eachTestSuitID],'w')
-			formatStr = "{0} {1} ".format(self.softwarePackage,self.dictOfCommands[commandID])
-			writeFile.write(formatStr)
+			formatString = "{0} {1} ".format(self.softwarePackage,self.dictOfCommands[commandID])
+			writeFile.write(formatString)
 			writeFile.write('\n')
 			data = self.fetchArgumentsForTestSuit(eachTestSuitID,commandID)
 			length = 0
 			dictData = {}
-			formatString = formatStr
+			
 			if data is not None:
 				argID = [x[0] for x in data]
 				arguments = [x[1] for x in data]
-				print(argID)
-				print(arguments)
-			for i in range(len(argID)):
-				eachArgID = argID[i]
-				eachArg = str(eachArgID)
-				argString = 'Arg' + eachArg
-				valueString = 'Value' + eachArg
+				
+			for eachArgID in argID:
+				argString = 'Arg'+str(eachArgID)
+				valueString = 'Value'+str(eachArgID)
 				formatString = formatString + '{'+argString+'} {'+valueString+'} '
-				
-				dictData[argString] = str(self.dictOfArguments[eachArgID])
-				
-				dictData[valueString] = str(self.dictOfArgVal[eachArgID])
-			print('\n')
-			print(dictData)
+				dictData[argString] = self.dictOfArguments[eachArgID]
+				if len(self.dictOfArgVal[eachArgID]) == 0:
+					dictData[valueString] = ''
+				elif len(self.dictOfArgVal[eachArgID]) == 1:
+					dictData[valueString] = self.dictOfArgVal[eachArgID][0]
+				else:
+					dictData[valueString] = str(self.dictOfArgVal[eachArgID])
 			print(formatString)
 			print(formatString.format(**dictData))
+			print('\n')
+			print(dictData)
 			formatString = formatString.format(**dictData)
 			
 			writeFile.write(formatString)
+			writeFile.write('\n')
 			
 			
 			
@@ -609,3 +610,23 @@ class enterDBSpace():
 		self.cnx.close()
 	
 
+def generateScripts(*args):
+	print("In proicedure to generate test suit scripts")
+	argIDs = args[0],
+	dictOfArguments = args[1]
+	dictOfArgVal = args[2]
+	formatString = args[3]
+	dictData = {}
+	for eachArgID in argIDs[0]:
+		print(eachArgID)
+		argString = 'Arg' + str(eachArgID)
+		valueString = 'Value' + str(eachArgID)
+		dictData[argString] = dictOfArguments[eachArgID]
+		if len(dictOfArgVal[eachArgID]) == 0:
+			dictData[valueString] = ''
+		elif len(dictOfArgVal[eachArgID]) == 1:
+			dictData[valueString] = dictOfArgVal[eachArgID][0]
+		else:
+			dictData[valueString] = str(dictOfArgVal[eachArgID])
+	print(dictData)
+	print(formatString.format(**dictData))
