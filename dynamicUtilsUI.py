@@ -84,7 +84,10 @@ def mappingNetworkDrive():
 		else:
 			print("Mapping network drive was unsuccessful")
 			print(err.decode('ascii'))
-			return ''
+			if 'MOUNT ERROR(16)' in(err.decode('ascii')).upper():
+				return mountLocation
+			else:
+				return ''
 
 	else:
 		print("The script is being tried to run on a platform outside the scope of the coverage of this tool. Please note that mapping the network drive would not be possible")
