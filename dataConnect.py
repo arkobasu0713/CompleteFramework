@@ -1,3 +1,4 @@
+import itertools
 import os
 import database as db
 import mysql.connector as MConn
@@ -473,6 +474,7 @@ class enterDBSpace():
 						listOfValues.append(defVal)
 					if eachValType == 'NSR' or eachValType == 'NER':
 						print('NSR/NER')
+						listOfValues.append('')
 						
 					if eachValType == 'IMP':
 						self.cursor.execute("select IMPORTS_FROM_COMMAND_ID, IMPORT_TAG from ARGUMENTS WHERE ARGUMENT_ID = %s and SOFTWARE_PACKAGE_ID = %s and COMMAND_ID = %s",[eachArg, self.softwarePackageID,argSet,])
@@ -540,33 +542,25 @@ class enterDBSpace():
 			data = self.fetchArgumentsForTestSuit(eachTestSuitID,commandID)
 			length = 0
 			dictData = {}
+			dictOfArgData = {}
+			listOfArgValues = []
 			
 			if data is not None:
 				argID = [x[0] for x in data]
 				arguments = [x[1] for x in data]
 				
-			for eachArgID in argID:
-				argString = 'Arg'+str(eachArgID)
-				valueString = 'Value'+str(eachArgID)
-				formatString = formatString + '{'+argString+'} {'+valueString+'} '
-				dictData[argString] = self.dictOfArguments[eachArgID]
-				if len(self.dictOfArgVal[eachArgID]) == 0:
-					dictData[valueString] = ''
-				elif len(self.dictOfArgVal[eachArgID]) == 1:
-					dictData[valueString] = self.dictOfArgVal[eachArgID][0]
-				else:
-					dictData[valueString] = str(self.dictOfArgVal[eachArgID])
-			print(formatString)
-			print(formatString.format(**dictData))
-			print('\n')
-			print(dictData)
-			formatString = formatString.format(**dictData)
-			
-			writeFile.write(formatString)
-			writeFile.write('\n')
-			
-			
-			
+			for i in range(len(argID)):
+				formatString = formatString + arguments[i] + ' {} ' 
+				dictOfArgData[argID[i]] = self.dictOfArgVal[argID[i]]
+				listOfArgValues.append(self.dictOfArgVal[argID[i]])
+				
+			#print("List of Arg Values: ")
+			#print(listOfArgValues)
+			#print("Product of Arg Values: ")
+			for eachArgumentSet in itertools.product(*listOfArgValues):
+				#print(eachArgumentSet)
+				writeFile.write(formatString.format(*eachArgumentSet))
+				writeFile.write('\n')
 
 	def runScripts(self):
 		dictOfStatus = {}
@@ -609,24 +603,3 @@ class enterDBSpace():
 		self.cursor.close()
 		self.cnx.close()
 	
-
-def generateScripts(*args):
-	print("In proicedure to generate test suit scripts")
-	argIDs = args[0],
-	dictOfArguments = args[1]
-	dictOfArgVal = args[2]
-	formatString = args[3]
-	dictData = {}
-	for eachArgID in argIDs[0]:
-		print(eachArgID)
-		argString = 'Arg' + str(eachArgID)
-		valueString = 'Value' + str(eachArgID)
-		dictData[argString] = dictOfArguments[eachArgID]
-		if len(dictOfArgVal[eachArgID]) == 0:
-			dictData[valueString] = ''
-		elif len(dictOfArgVal[eachArgID]) == 1:
-			dictData[valueString] = dictOfArgVal[eachArgID][0]
-		else:
-			dictData[valueString] = str(dictOfArgVal[eachArgID])
-	print(dictData)
-	print(formatString.format(**dictData))
