@@ -509,6 +509,63 @@ class enterDBSpace():
 				for eachArgVal in self.dictOfArgVal[eachArg]:
 					writeFile.write(str(self.softwarePackage) + ' ' + str(self.dictOfCommands[eachCommandID2]) + ' ' + str(self.dictOfArguments[eachArg]) + ' ' + str(eachArgVal))
 					writeFile.write('\n')
+					
+	def createScriptsForTestSuit(self,*args):
+		print("In procedure to create test scripts for test suits")
+		
+		commandID = args[0]
+		testSuitSelection = args[1]
+		logFilePath = args[2]
+		dictOfTestSuit = args[3]
+		self.outputLocation = createOutputLogDirectory(logFilePath)
+		self.dictOfFileNames = {}
+		print("commandID: " + str(commandID))
+		print("dictOfCommandArguments: ")
+		print(self.dictOfCommandArguments)
+		print("dictOfArguments")
+		print(self.dictOfArguments)
+		print('dictOfArgVal: ')
+		print(self.dictOfArgVal)
+		
+		for eachTestSuit in testSuitSelection:
+			filename = str(self.dictOfCommands[commandID]) + '_' + str(dictOfTestSuit[eachTestSuit])
+			filenameCreated = createScript(filename,self.outputLocation)
+			self.dictOfFileNames[eachTestSuit] = filenameCreated
+
+		for eachTestSuitID in testSuitSelection:
+			writeFile = open(self.dictOfFileNames[eachTestSuitID],'w')
+			formatStr = "{0} {1} ".format(self.softwarePackage,self.dictOfCommands[commandID])
+			writeFile.write(formatStr)
+			writeFile.write('\n')
+			data = self.fetchArgumentsForTestSuit(eachTestSuitID,commandID)
+			length = 0
+			dictData = {}
+			formatString = formatStr
+			if data is not None:
+				argID = [x[0] for x in data]
+				arguments = [x[1] for x in data]
+				print(argID)
+				print(arguments)
+			for i in range(len(argID)):
+				eachArgID = argID[i]
+				eachArg = str(eachArgID)
+				argString = 'Arg' + eachArg
+				valueString = 'Value' + eachArg
+				formatString = formatString + '{'+argString+'} {'+valueString+'} '
+				
+				dictData[argString] = str(self.dictOfArguments[eachArgID])
+				
+				dictData[valueString] = str(self.dictOfArgVal[eachArgID])
+			print('\n')
+			print(dictData)
+			print(formatString)
+			print(formatString.format(**dictData))
+			formatString = formatString.format(**dictData)
+			
+			writeFile.write(formatString)
+			
+			
+			
 
 	def runScripts(self):
 		dictOfStatus = {}

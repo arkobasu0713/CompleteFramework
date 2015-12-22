@@ -181,6 +181,9 @@ def selectTestSuit(*args):
 	testSuitID = args[0]
 	testSuitSelection = args[1]
 	commandID = args[2]
+	testSuitName = args[3]
+	dictTestSuit = args[4]
+	dictTestSuit[testSuitID] = testSuitName
 	if testSuitID in testSuitSelection:
 		testSuitSelection.remove(testSuitID)
 	else:
@@ -205,6 +208,7 @@ class DisplayPackagesDetailsScreen(Screen):
 		self.logFilePath = ''
 		self.folderName = ''
 		self.testSuitSelection = [] 
+		self.dictTestSuit = {}
 		self.commandID = ''
 		
 		conn.retreiveCommandsUnderSoftwarePackage(conn.softwarePackageID)
@@ -245,7 +249,7 @@ class DisplayPackagesDetailsScreen(Screen):
 					testSuitName = eachDataSet[1]
 					btn = UTIL.myButton(text=testSuitName,color=(1,0,0,1),id=str(testSuitID))
 					self.ids.grid_id_customTestSuit_DPDS.add_widget(btn)
-					btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection))
+					btn.bind(on_press=Par(selectTestSuit,testSuitID,self.testSuitSelection,commandID,testSuitName,self.dictTestSuit))
 		else:
 			self.commandID = ''
 		
@@ -312,6 +316,18 @@ class DisplayPackagesDetailsScreen(Screen):
 		print("In procedure to run for selected test suits")
 		print(self.testSuitSelection)
 		print(self.commandID)
+		
+		logFilePath = self.ids.id_logpath_DPDS.text
+		if logFilePath == "":
+			logFilePath = UTIL.fetchLogFilePath()
+		if self.mapDriveAt != '':
+			logFilePath = self.folderName
+		print(logFilePath)
+		
+		conn.fetchArgumentsForSelectCommands([self.commandID])
+		conn.retreiveValuesForArguments()
+		
+		conn.createScriptsForTestSuit(self.commandID,self.testSuitSelection,logFilePath,self.dictTestSuit)
 
 	def refreshContents(self):
 		conn.reEstablishConnection()

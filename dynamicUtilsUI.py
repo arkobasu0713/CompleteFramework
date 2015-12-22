@@ -471,9 +471,6 @@ def selectTestSuit(*args):
 		btn_sub_testSuit.disabled = True
 		for eachChild in gridlayout.children:
 			eachChild.background_color = list([.5,.2,.2,1])
-		
-		
-
 
 def createP1(*args):
 	stat = args[0]
